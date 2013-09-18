@@ -80,12 +80,10 @@ var getToken = function() {
 }
 
 
-
-
 /**
  * Neuer Kunde
  */
-var createMitarbeiter = function() {
+var generateMitarbeiter = function() {
 
     var text = '';
     var titel = '';
@@ -140,68 +138,6 @@ var createMitarbeiter = function() {
 }
 
 
-/**
- * Neuer Kunde
- */
-var createKunde = function() {
-
-    var text = '';
-    var titel = '';
-
-    if (!token) {
-        log('ERROR: No valid editToken found!');
-        return false;
-    }
-
-    //////////////////////////////
-    // Create Mitarbeiter ////////
-    //////////////////////////////
-
-
-    // KONTAKTDATEN
-
-    var kontaktdaten = generateKontaktdaten();
-
-    text += kontaktdaten.text;
-    titel = kontaktdaten.titel;
-
-
-    // SONSTIGE DATEN
-
-    var abteilung = $.rand(data.abteilungenArray);
-    var hardware = $.rand(data.hardwareArray) + ', ' + $.rand(data.hardwareArray) + ', ' + $.rand(data.hardwareArray);
-    var software = $.rand(data.softwareArray) + ', ' + $.rand(data.softwareArray);
-
-    text +=
-        '{{Mitarbeiter Fakten' + '\n' +
-        '|Leiter=' + '' + '\n' +
-        '|Abteilung=' + abteilung + '\n' +
-        '|Hardware=' + hardware + '\n' +
-        '|Software=' + software + '\n' +
-        '}}' + '\n';
-
-
-    // API REQUEST:
-
-    $.post(
-        mediaWikiUrl + '/api.php?',
-        {
-            action: 'edit',
-            title: titel,
-            text: text,
-            token: token,
-            format: 'json'
-        },
-        function( data ) {
-            console.log('Neuer Mitarbeiter - Request erfolgreich:')
-            console.log(text);
-            console.dir(data);
-            log('PAGE <a href="' + mediaWikiUrl + '/index.php?curid=' + data.edit.pageid + '" target="_blank">' + titel + '</a> CREATED / EDITED with ' + data.edit.result);
-        }
-    );
-
-}
-
 
 //////////////////////////////
 // Hilfsfunktionen          //
@@ -213,6 +149,7 @@ function generateKontaktdaten() {
     var vorname = $.rand(data.vornamenArray);
     var nachname = $.rand(data.nachnamenArray);
     var mail = vorname + '.' + nachname + '@gmail.com';
+    mail = mail.split(' ').join('_');
     var festnetz = Math.floor(Math.random() * 892124257716) + 082124257716
     var handy = Math.floor(Math.random() * 892124257716) + 082124257716
     var strasse = $.rand(data.vornamenArray) + ' Platz ' + Math.floor(Math.random() * 200) + 1;
@@ -240,7 +177,10 @@ function generateKontaktdaten() {
 
 function log(msg) {
     var currentdate = new Date();
-    var time = currentdate.getHours() + ":" + currentdate.getMinutes() + ":" + currentdate.getSeconds();
+    var time = pad(currentdate.getHours())
+        + ":" + pad(currentdate.getMinutes())
+        + ":" + pad(currentdate.getSeconds());
+
     $('#msg').append('<pre><div class="label label-info">' + time + '</div> ' + msg + '</pre>');
 }
 
@@ -255,3 +195,7 @@ function log(msg) {
         }
     };
 })(jQuery);
+
+function pad(n){
+    return n<10 ? '0'+n : n
+}

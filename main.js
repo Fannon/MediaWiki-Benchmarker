@@ -1,9 +1,0 @@
-"use strict";
-
-
-//////////////////////////////
-// Variables and Options    //
-//////////////////////////////
-
-var mediaWikiUrl = 'http://localhost/wiki';
-

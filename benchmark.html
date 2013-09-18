@@ -1,25 +1,46 @@
 <!DOCTYPE html>
 <html>
 <head>
-<script src="js/jquery-2.0.3.js"></script>
-<link href="css/bootstrap.css" rel="stylesheet" type="text/css" />
-<script src="js/bootstrap.js"></script>
-<script src="js/main.js"></script>
-<script src="js/benchmark.js"></script>
-<meta charset=utf-8 />
-<title>MediaWiki Benchmark</title>
+    <script src="js/jquery-2.0.3.js"></script>
+    <link href="css/bootstrap.css" rel="stylesheet" type="text/css" />
+    <script src="js/bootstrap.js"></script>
+    <script src="js/main.js"></script>
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+
+    <script src="js/benchmark.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+
+    <meta charset=utf-8 />
+    <title>MediaWiki Benchmark</title>
+
+
 </head>
 <body>
+
 <div class="container">
     <div class="span12">
         <h1>MediaWiki Benchmark</h1>
 
-        <h2>Actions:</h2>
-        <button class="btn btn-large btn-primary" type="button" onclick="createMitarbeiter();">Benchmark 1</button>
-        <button class="btn btn-large btn-primary" type="button" onclick="createKunde();">Benchmark 2</button>
+        <h3>Benchmark multiple Pages via API Parse Request:</h3>
+        <form class="form-inline" role="form">
+          <div class="form-group col-lg-6">
+            <label class="sr-only" for="exampleInputEmail2">Email address</label>
+            <input id="pages" type="email" class="form-control" placeholder="Pages to benchmark (Comma Seperated)">
+          </div>
+          <div class="form-group">
+            <label class="sr-only" for="exampleInputPassword2">maxCounter</label>
+            <input id="maxCounter" class="form-control" placeholder="maxCounter">
+          </div>
+          <button class="btn btn-large btn-primary" type="button" onclick="runBenchmark();">Benchmark!</button>
+        </form>
 
-        <h2>Messages:</h2>
+        <h3>Chart:</h3>
+        <div id="chart_div"></div>
+
+        <h3>Data:</h3>
         <div id="msg"></div>
+
+        <a id='jsonExport' target="_blank" class="btn btn-info" disabled="disabled">Download JSON</a>
 
     </div>
 </div>
