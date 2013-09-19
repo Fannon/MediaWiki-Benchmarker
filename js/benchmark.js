@@ -1,9 +1,12 @@
-"use strict";
+/* jshint jquery: true, devel: true */
+/* global google, ss */
 
 
 //////////////////////////////
 // Variables and Options    //
 //////////////////////////////
+
+var mediaWikiUrl = 'http://localhost/wiki/';
 
 var currentInterval = 0;
 var minRandom = 300;
@@ -26,13 +29,19 @@ var dataObject = {
 // Startup                  //
 //////////////////////////////
 
-google.load("visualization", "1", {packages:["corechart"]});
+google.load("visualization", "1", {packages: ["corechart"]});
 
 /**
  * Resets the state of the tool
  */
-var reset = function() {
-    dataArray = [[]]; // 2 Dim Array
+var reset = function () {
+    "use strict";
+
+    console.log('RESETTING DATA');
+
+    dataArray = [
+        []
+    ]; // 2 Dim Array
     dataObject = dataObject = {
         data: {},
         analysis: {}
@@ -40,12 +49,13 @@ var reset = function() {
     progress = 0;
     currentCounter = 0;
     currentInterval = 0;
-    $('#progress').attr( "aria-valuenow", 0).css('width', 0 + '%');
+    $('#progress').attr("aria-valuenow", 0).css('width', 0 + '%');
     $('#chart_div').html('');
     $('#data-tbody').html('');
-}
+};
 
-$(function() {
+$(function () {
+    "use strict";
     reset();
     $('#mediaWikiUrl').val(mediaWikiUrl);
     $('#maxCounter').val(maxCounter);
@@ -61,7 +71,10 @@ $(function() {
 /**
  * Prepares and launches the Benchmark
  */
-var runBenchmark = function() {
+var runBenchmark = function () {
+    "use strict";
+
+    console.log('STARTING A NEW BENCHMARK');
 
     // Reset currentCounter
     reset();
@@ -75,9 +88,9 @@ var runBenchmark = function() {
 
     // Get current Form Values
     mediaWikiUrl = $('#mediaWikiUrl').val();
-    maxCounter = parseInt($('#maxCounter').val());
-    minRandom = parseInt($('#minRandom').val());
-    maxRandom = parseInt($('#maxRandom').val());
+    maxCounter = parseInt($('#maxCounter').val(), 10);
+    minRandom = parseInt($('#minRandom').val(), 10);
+    maxRandom = parseInt($('#maxRandom').val(), 10);
 
     progressTotal = maxCounter * pages.length;
 
@@ -96,31 +109,32 @@ var runBenchmark = function() {
         dataArray[currentCounter].push(currentCounter);
 
         // Iterate Pages
-        for (var i = 0; i < pages.length; i++) {
+        for (var j = 0; i < pages.length; j++) {
 
-            currentInterval += (minRandom + Math.floor(Math.random()*maxRandom));
+            currentInterval += (minRandom + Math.floor(Math.random() * maxRandom));
 
-            var page = pages[i]
+            var page = pages[j];
 
             console.log('Benchmarking ' + page + ' after interval ' + currentInterval + ' Count: ' + currentCounter);
 
             benchmarkPage(page, currentCounter, currentInterval);
 
-        };
+        }
     }
-}
+};
 
 
 /**
  * Benchmarks a Page after a given time interval
  *
- * @param  {[type]} page            [description]
- * @param  {[type]} currentCounter  [description]
- * @param  {[type]} currentInterval [description]
+ * @param  {String} page            [description]
+ * @param  {Number} currentCounter  [description]
+ * @param  {Number} currentInterval [description]
  */
 function benchmarkPage(page, currentCounter, currentInterval) {
+    "use strict";
 
-    setTimeout(function(){
+    setTimeout(function () {
 
         var now = new Date().getTime();
 
@@ -128,10 +142,14 @@ function benchmarkPage(page, currentCounter, currentInterval) {
             action: 'parse',
             page: page,
             format: 'json'
-        }, function( data ) {
+        }, function (data) {
+
+            if (data.error) {
+                console.error('API ERROR');
+            }
 
             var then = new Date().getTime();
-            var time =  then - now;
+            var time = then - now;
 
             console.log('[' + currentCounter + '] Page ' + page + ' loaded in ' + time + 'ms.');
 
@@ -141,7 +159,7 @@ function benchmarkPage(page, currentCounter, currentInterval) {
             // Progress Bar
             progress += 1;
             var percent = progress / progressTotal * 100;
-            $('#progress').attr( "aria-valuenow", percent).css('width', percent + '%');
+            $('#progress').attr("aria-valuenow", percent).css('width', percent + '%');
 
             // If completed, draw Chart
             if (percent >= 100) {
@@ -162,13 +180,15 @@ function benchmarkPage(page, currentCounter, currentInterval) {
  * Uses http://macwright.org/simple-statistics/ for Statistical Analysis
  */
 function drawData() {
+    "use strict";
+
 
     console.log('Analyzing Data');
 
     // Analyze Data & draw the Table
     var html = '';
 
-    $.each(dataObject.data, function(key, value) {
+    $.each(dataObject.data, function (key, value) {
 
         console.log(key + ' : ' + value);
 
@@ -222,6 +242,7 @@ function drawData() {
  * Uses Google Chart
  */
 function drawChart() {
+    "use strict";
 
     console.log('Plotting Graph');
     console.dir(dataArray);
@@ -229,15 +250,16 @@ function drawChart() {
     var data = google.visualization.arrayToDataTable(dataArray);
 
     var options = {
-      title: 'Page Performance (ms)',
-      theme: 'maximized',
-      focusTarget: 'category',
-      pointSize: 2,
-      lineWidth: 1
+        title: 'Page Performance (ms)',
+        theme: 'maximized',
+        focusTarget: 'category',
+        pointSize: 2,
+        lineWidth: 1
 
     };
 
-    var chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
+    // var chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
+    var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
     chart.draw(data, options);
 }
 
@@ -248,15 +270,22 @@ function drawChart() {
 
 // http://stackoverflow.com/questions/11257062/converting-json-object-to-csv-format-in-javascript
 function convertToCSV(objArray) {
-    var array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray;
+    "use strict";
+
+    var array = typeof objArray !== 'object' ? JSON.parse(objArray) : objArray;
     var str = '';
 
     for (var i = 0; i < array.length; i++) {
         var line = '';
         for (var index in array[i]) {
-            if (line != '') line += ';'
 
-            line += array[i][index];
+            if (array[i].hasOwnProperty(index)) {
+                if (line !== '') {
+                    line += ';';
+                }
+
+                line += array[i][index];
+            }
         }
 
         str += line + '\r\n';
@@ -265,3 +294,61 @@ function convertToCSV(objArray) {
     return str;
 }
 
+/**
+ * Pads a Number
+ * @param n
+ * @returns {string}
+ */
+function pad(n) {
+    "use strict";
+
+    return n < 10 ? '0' + n : n;
+}
+
+/**
+ * Write a Message to the Message Div
+ * @param msg
+ */
+function log(msg) {
+    "use strict";
+
+    var currentdate = new Date();
+    var time = pad(currentdate.getHours()) + ":" + pad(currentdate.getMinutes()) + ":" + pad(currentdate.getSeconds());
+    $('#msg').append('<pre><div class="label label-info">' + time + '</div> ' + msg + '</pre>');
+}
+
+/**
+ * Get Random Element from Array -> jQuery Function
+ */
+(function ($) {
+    "use strict";
+
+    $.rand = function (arg) {
+        if ($.isArray(arg)) {
+            return arg[$.rand(arg.length)];
+        } else if (typeof arg === "number") {
+            return Math.floor(Math.random() * arg);
+        } else {
+            return 4;  // chosen by fair dice roll
+        }
+    };
+})(jQuery);
+
+/**
+ * Returns a DateString
+ * @return {String}           [description]
+ */
+function getTime() {
+    "use strict";
+
+    var a = new Date();
+
+    var year = a.getFullYear();
+    var month = pad(a.getMonth());
+    var date = pad(a.getDate());
+    var hour = pad(a.getHours());
+    var min = pad(a.getMinutes());
+    var sec = pad(a.getSeconds());
+
+    return year + '-' + month + '-' + date + '_' + hour + ':' + min + ':' + sec;
+}
