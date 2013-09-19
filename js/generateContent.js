@@ -1,7 +1,4 @@
-/*jshint: jQuery */
-
-"use strict";
-
+/* jshint jquery: true, devel: true */
 
 //////////////////////////////
 // Variables and Options    //
@@ -75,6 +72,8 @@ data.herstellerArray = [
  * On Document Load
  */
 $(function () {
+    "use strict";
+
     log('SCRIPT LOADED');
     getToken();
 });
@@ -84,6 +83,7 @@ $(function () {
  * Gets Token which is required to use the MediaWiki API for editing/creating Content
  */
 var getToken = function () {
+    "use strict";
 
     $.getJSON(mediaWikiUrl + '/api.php?', {
         action: 'query',
@@ -99,13 +99,14 @@ var getToken = function () {
         token = data.query.pages[1].edittoken;
         log('GET EditToken: ' + token);
     });
-}
+};
 
 
 /**
  * Neuer Mitarbeiter
  */
 var generateMitarbeiter = function () {
+    "use strict";
 
     var text = '';
     var titel = '';
@@ -125,9 +126,9 @@ var generateMitarbeiter = function () {
 
     // SONSTIGE DATEN
 
-    var abteilung = $.rand(data.abteilungenArray);
-    var hardware = $.rand(data.remoteHardwareArray) + ', ' + $.rand(data.remoteHardwareArray) + ', ' + $.rand(data.remoteHardwareArray);
-    var software = $.rand(data.softwareArray) + ', ' + $.rand(data.softwareArray);
+    var abteilung = randomElement(data.abteilungenArray);
+    var hardware = randomElement(data.remoteHardwareArray) + ', ' + randomElement(data.remoteHardwareArray) + ', ' + randomElement(data.remoteHardwareArray);
+    var software = randomElement(data.softwareArray) + ', ' + randomElement(data.softwareArray);
 
     text +=
         '{{Mitarbeiter Fakten' + '\n' +
@@ -157,16 +158,17 @@ var generateMitarbeiter = function () {
 
     return titel;
 
-}
+};
 
 
 /**
  * Neuer Kunde
  */
 var generateKunde = function () {
+    "use strict";
 
     var text = '';
-    var titel = $.rand(data.kundenVornamenArray) + ' ' + $.rand(data.kundenNachnamenArray);
+    var titel = randomElement(data.kundenVornamenArray) + ' ' + randomElement(data.kundenNachnamenArray);
 
     if (!token) {
         log('ERROR: No valid editToken found!');
@@ -178,21 +180,19 @@ var generateKunde = function () {
     text += '{{Standort Überschrift}}\n';
 
     for (var i = 0; i < Math.random() * 4; i++) {
-        var standortTitel = $.rand(data.strasseArray) + ' ' + Math.floor(Math.random() * 200);
+        var standortTitel = randomElement(data.strasseArray) + ' ' + Math.floor(Math.random() * 200);
         text += '{{Standort Liste\n|Standort=' + standortTitel + '\n}}\n';
         // SUBROUTINE: Standorte generieren
         generateStandort(standortTitel);
     }
-    ;
 
     // Remote Hardware generieren
     text += '{{Remote Hardware Überschrift}}\n';
 
-    for (var i = 0; i < Math.random() * 5; i++) {
-        var remoteHardwareTitel = $.rand(data.remoteHardwareArray);
+    for (i = 0; i < Math.random() * 5; i++) {
+        var remoteHardwareTitel = randomElement(data.remoteHardwareArray);
         text += '{{Remote Hardware Liste\n|Remote Hardware=' + remoteHardwareTitel + '\n}}\n';
     }
-    ;
 
     // Bemerkung
     text += '{{Kunde Infos\n|Bemerkungen=Keine Bemerkungen\n}}\n';
@@ -209,7 +209,7 @@ var generateKunde = function () {
             log('FEHLER BEIM API AUFRUF!');
             console.dir(data);
         }
-        console.log('Neuer Kunde - Request erfolgreich:')
+        console.log('Neuer Kunde - Request erfolgreich:');
         console.log(text);
         console.dir(data);
         log('KUNDE <a href="' + mediaWikiUrl + '/index.php?curid=' + data.edit.pageid + '" target="_blank">' + titel + '</a> CREATED / EDITED with ' + data.edit.result);
@@ -217,10 +217,11 @@ var generateKunde = function () {
 
     return titel;
 
-}
+};
 
 
 var generateStandort = function (standortTitel) {
+    "use strict";
 
     console.log('Standort generieren: ' + standortTitel);
 
@@ -262,7 +263,7 @@ var generateStandort = function (standortTitel) {
             console.dir(data);
         }
 
-        console.log('Neuer Standort - Request erfolgreich:')
+        console.log('Neuer Standort - Request erfolgreich:');
         console.log(text);
         console.dir(data);
         log('STANDORT <a href="' + mediaWikiUrl + '/index.php?curid=' + data.edit.pageid + '" target="_blank">' + titel + '</a> CREATED / EDITED with ' + data.edit.result);
@@ -273,6 +274,7 @@ var generateStandort = function (standortTitel) {
 };
 
 var generateLokaleHardware = function (hardwareTitel, ip) {
+    "use strict";
 
     console.log('Lokale Hardware generieren: ' + hardwareTitel);
 
@@ -285,7 +287,7 @@ var generateLokaleHardware = function (hardwareTitel, ip) {
     }
 
     // HARDWARE DATEN
-    var hersteller = $.rand(data.herstellerArray);
+    var hersteller = randomElement(data.herstellerArray);
     text += '{{Hardware\n';
     text += '|IP=' + ip + '\n';
     text += '|Bezeichnung=' + 'EZ-' + Math.floor(Math.random() * 2048) + '\n';
@@ -301,7 +303,7 @@ var generateLokaleHardware = function (hardwareTitel, ip) {
     text += '{{Software Überschrift}}\n';
 
     for (var i = 0; i < Math.random() * 5; i++) {
-        var softwareTitel = $.rand(data.softwareArray);
+        var softwareTitel = randomElement(data.softwareArray);
         text += '{{Software Liste\n|Software=' + softwareTitel + '\n}}\n';
     }
 
@@ -330,7 +332,7 @@ var generateLokaleHardware = function (hardwareTitel, ip) {
             console.dir(data);
         }
 
-        console.log('Neue lokale Hardware - Request erfolgreich:')
+        console.log('Neue lokale Hardware - Request erfolgreich:');
         console.log(text);
         console.dir(data);
         log('LOKALE HARDWARE <a href="' + mediaWikiUrl + '/index.php?curid=' + data.edit.pageid + '" target="_blank">' + titel + '</a> CREATED / EDITED with ' + data.edit.result);
@@ -347,15 +349,16 @@ var generateLokaleHardware = function (hardwareTitel, ip) {
 
 
 function generateKontaktdaten() {
+    "use strict";
 
-    var vorname = $.rand(data.vornamenArray);
-    var nachname = $.rand(data.nachnamenArray);
+    var vorname = randomElement(data.vornamenArray);
+    var nachname = randomElement(data.nachnamenArray);
     var mail = vorname + '.' + nachname + '@gmail.com';
     mail = mail.split(' ').join('_');
-    var festnetz = Math.floor(Math.random() * 892124257716) + 082124257716
-    var handy = Math.floor(Math.random() * 892124257716) + 082124257716
-    var strasse = $.rand(data.vornamenArray) + ' Platz ' + Math.floor(Math.random() * 200) + 1;
-    var ort = $.rand(data.ortArray);
+    var festnetz = '+49' + Math.floor(Math.random() * 89212425716) + 82124257716;
+    var handy = '+49' +Math.floor(Math.random() * 89212425716) + 82124257716;
+    var strasse = randomElement(data.vornamenArray) + ' Platz ' + Math.floor(Math.random() * 200) + 1;
+    var ort = randomElement(data.ortArray);
     var plz = Math.floor(Math.random() * 90000) + 10000;
 
     var titel = vorname + ' ' + nachname;
@@ -383,6 +386,8 @@ function generateKontaktdaten() {
  * @returns {string}
  */
 function pad(n) {
+    "use strict";
+
     return n < 10 ? '0' + n : n;
 }
 
@@ -391,47 +396,14 @@ function pad(n) {
  * @param msg
  */
 function log(msg) {
-    var currentdate = new Date();
-    var time = pad(currentdate.getHours())
-        + ":" + pad(currentdate.getMinutes())
-        + ":" + pad(currentdate.getSeconds());
+    "use strict";
 
+    var currentdate = new Date();
+    var time = pad(currentdate.getHours()) + ":" + pad(currentdate.getMinutes()) + ":" + pad(currentdate.getSeconds());
     $('#msg').append('<pre><div class="label label-info">' + time + '</div> ' + msg + '</pre>');
 }
 
-/**
- * Get Random Element from Array -> jQuery Function
- */
-(function ($) {
-    $.rand = function (arg) {
-        if ($.isArray(arg)) {
-            return arg[$.rand(arg.length)];
-        } else if (typeof arg === "number") {
-            return Math.floor(Math.random() * arg);
-        } else {
-            return 4;  // chosen by fair dice roll
-        }
-    };
-})(jQuery);
-
-/**
- * Returns a DateString
- * @param  {[type]} timestamp [description]
- * @return {String}           [description]
- */
-function getTime(timestamp) {
-
-    if (timestamp) {
-        var a = new Date(timestamp);
-    } else {
-        var a = new Date();
-    }
-
-    var year = a.getFullYear();
-    var month = pad(a.getMonth());
-    var date = pad(a.getDate());
-    var hour = pad(a.getHours());
-    var min = pad(a.getMinutes());
-    var sec = pad(a.getSeconds());
-    return year + '-' + month + '-' + date + '_' + hour + ':' + min + ':' + sec;
-}
+var randomElement = function (array) {
+    "use strict";
+    return array[Math.floor(Math.random() * array.length)];
+};

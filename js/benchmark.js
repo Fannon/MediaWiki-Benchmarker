@@ -6,7 +6,12 @@
 // Variables and Options    //
 //////////////////////////////
 
+/** (Default) URL to MediaWiki Installation */
 var mediaWikiUrl = 'http://localhost/wiki/';
+var purgePages = false;
+var purgeInterval = 300;
+
+var errorOccured = false;
 
 var currentInterval = 0;
 var minRandom = 300;
@@ -37,18 +42,22 @@ google.load("visualization", "1", {packages: ["corechart"]});
 var reset = function () {
     "use strict";
 
-    console.log('RESETTING DATA');
+    console.log('Resetting');
 
+    // Reset Variables / Data
     dataArray = [
         []
     ]; // 2 Dim Array
-    dataObject = dataObject = {
+    dataObject = {
         data: {},
         analysis: {}
     };
     progress = 0;
     currentCounter = 0;
     currentInterval = 0;
+    errorOccured = false;
+
+    // Reset Interface
     $('#progress').attr("aria-valuenow", 0).css('width', 0 + '%');
     $('#chart_div').html('');
     $('#data-tbody').html('');
@@ -56,11 +65,12 @@ var reset = function () {
 
 $(function () {
     "use strict";
-    reset();
+    console.log('MediaWiki Benchmark Script ready!');
     $('#mediaWikiUrl').val(mediaWikiUrl);
     $('#maxCounter').val(maxCounter);
     $('#minRandom').val(minRandom);
     $('#maxRandom').val(maxRandom);
+    $('#purgeInterval').val(purgeInterval);
 });
 
 
@@ -91,6 +101,8 @@ var runBenchmark = function () {
     maxCounter = parseInt($('#maxCounter').val(), 10);
     minRandom = parseInt($('#minRandom').val(), 10);
     maxRandom = parseInt($('#maxRandom').val(), 10);
+    purgeInterval = parseInt($('#purgeInterval').val(), 10);
+    purgePages = $('#purgePages').prop('checked');
 
     progressTotal = maxCounter * pages.length;
 
@@ -109,13 +121,18 @@ var runBenchmark = function () {
         dataArray[currentCounter].push(currentCounter);
 
         // Iterate Pages
-        for (var j = 0; i < pages.length; j++) {
+        for (var j = 0; j < pages.length; j++) {
 
-            currentInterval += (minRandom + Math.floor(Math.random() * maxRandom));
-
+            currentInterval += Math.floor(Math.random() * (maxRandom-minRandom) + minRandom);
             var page = pages[j];
-
             console.log('Benchmarking ' + page + ' after interval ' + currentInterval + ' Count: ' + currentCounter);
+
+            if (purgePages) {
+
+                purgePage(page, currentCounter, currentInterval);
+                currentInterval += purgeInterval;
+
+            }
 
             benchmarkPage(page, currentCounter, currentInterval);
 
@@ -145,7 +162,9 @@ function benchmarkPage(page, currentCounter, currentInterval) {
         }, function (data) {
 
             if (data.error) {
-                console.error('API ERROR');
+                log('API ERROR: "' + data.error.code + '" - ' + data.error.info);
+                console.dir(data);
+                return false;
             }
 
             var then = new Date().getTime();
@@ -170,6 +189,40 @@ function benchmarkPage(page, currentCounter, currentInterval) {
         });
 
     }, currentInterval);
+
+    return true;
+
+}
+
+function purgePage(page, currentCounter, currentInterval) {
+    "use strict";
+
+    setTimeout(function () {
+
+        var now = new Date().getTime();
+
+        $.post(mediaWikiUrl + '/api.php?', {
+            action: 'purge',
+            page: page,
+            format: 'json'
+        }, function (data) {
+
+            if (data.error) {
+                log('API ERROR: "' + data.error.code + '" - ' + data.error.info);
+                console.dir(data);
+                return false;
+            }
+
+            var then = new Date().getTime();
+            var time = then - now;
+
+            console.info('[' + currentCounter + '] Page ' + page + ' purged in ' + time + 'ms.');
+
+        });
+
+    }, currentInterval);
+
+    return true;
 
 }
 
@@ -314,7 +367,8 @@ function log(msg) {
 
     var currentdate = new Date();
     var time = pad(currentdate.getHours()) + ":" + pad(currentdate.getMinutes()) + ":" + pad(currentdate.getSeconds());
-    $('#msg').append('<pre><div class="label label-info">' + time + '</div> ' + msg + '</pre>');
+    $('#msg').append('<div class="alert alert-warning">[' + time + '] ' + msg + '<a class="close" data-dismiss="alert" href="#" aria-hidden="true">&times;</a></div>');
+    $(".alert").alert();
 }
 
 /**
