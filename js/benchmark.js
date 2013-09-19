@@ -106,6 +106,17 @@ var runBenchmark = function () {
 
     progressTotal = maxCounter * pages.length;
 
+    dataObject.options = {
+        mediaWikiUrl: mediaWikiUrl,
+        maxCounter: maxCounter,
+        minRandom: minRandom,
+        maxRandom: maxRandom,
+        purgePages: purgePages,
+        purgeInterval: purgeInterval,
+        progressTotal: progressTotal
+
+    };
+
     dataArray[0][0] = 'Iteration';
 
     for (var i = 0; i < pages.length; i++) {
@@ -288,6 +299,14 @@ function drawData() {
     csvExport.removeAttr("disabled");
     csvExport.attr("href", 'data:text/csv;base64,' + btoa(convertToCSV(dataArray)));
     csvExport.attr("download", getTime() + "_TableData.csv");
+
+    // SVG Export
+    var svgExport = $('#svgExport');
+    svgExport.removeAttr("disabled");
+    svgExport.attr("href", 'data:text/svg;base64,' + btoa($('#chart_div div div').html()));
+    svgExport.attr("download", getTime() + "_Graph.svg");
+
+
 }
 
 /**
@@ -306,6 +325,9 @@ function drawChart() {
         title: 'Page Performance (ms)',
         theme: 'maximized',
         focusTarget: 'category',
+        vAxis: {
+            minValue: 0
+        },
         pointSize: 2,
         lineWidth: 1
 
