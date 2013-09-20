@@ -131,7 +131,7 @@ var generateMitarbeiter = function () {
     var software = randomElement(data.softwareArray) + ', ' + randomElement(data.softwareArray);
 
     text +=
-        '{{Mitarbeiter Fakten' + '\n' +
+        '{{Mitarbeiter Daten' + '\n' +
             '|Abteilung=' + abteilung + '\n' +
             '|Hardware=' + hardware + '\n' +
             '|Software=' + software + '\n' +
@@ -288,13 +288,17 @@ var generateLokaleHardware = function (hardwareTitel, ip) {
 
     // HARDWARE DATEN
     var hersteller = randomElement(data.herstellerArray);
+    var bezeichnung = 'Z-' + Math.floor(Math.random() * 8);
+    var hardwaremodell = hersteller + ' ' + bezeichnung;
     text += '{{Hardware\n';
     text += '|IP=' + ip + '\n';
+    text += '|Hardwaremodell=' + hardwaremodell + '\n';
     text += '|Bezeichnung=' + 'EZ-' + Math.floor(Math.random() * 2048) + '\n';
-    text += '|Hersteller=' + hersteller + '\n';
-    text += '|Modellname=' + hersteller + ' Z-' + Math.floor(Math.random() * 2048) + '\n';
     text += '|Domäne=MSHEIMNETZ\n';
     text += '}}\n';
+
+    // SUBROUTINE: Generiere Modell
+    generateHardwaremodell(hersteller, bezeichnung);
 
     // VERNETZUNG
     text += '{{Vernetzung Überschrift}}\n';
@@ -342,6 +346,54 @@ var generateLokaleHardware = function (hardwareTitel, ip) {
 
 };
 
+var generateHardwaremodell = function (hersteller, bezeichnung) {
+    "use strict";
+
+    var text = '';
+    var titel = hersteller + ' ' + bezeichnung;
+
+    console.log('Hardwaremodell generieren: ' + titel);
+
+    if (!token) {
+        log('ERROR: No valid editToken found!');
+        return false;
+    }
+
+    // HARDWARE DATEN
+    text += '{{Hardwaremodell\n';
+    text += '|Hersteller=' + hersteller + '\n';
+    text += '|Bezeichnung=' + bezeichnung + '\n';
+    text += '}}\n';
+
+    // PROBLEME
+    text += '{{Problem Überschrift}}\n';
+    text += '{{Problem\n |Problem=Internet geht nicht\n|Lösung=Router neustarten\n }}\n';
+    text += '{{Problem\n |Problem=Kaputt\n|Lösung=Neu kaufen\n}}\n';
+
+    // API REQUEST:
+    $.post(mediaWikiUrl + '/api.php?', {
+        action: 'edit',
+        title: titel,
+        text: text,
+        token: token,
+        format: 'json'
+    }, function (data) {
+
+        if (data.error) {
+            log('FEHLER BEIM API AUFRUF!');
+            console.dir(data);
+        }
+
+        console.log('Neues Hardwaremodell - Request erfolgreich:');
+        console.log(text);
+        console.dir(data);
+        log('HARDWAREMODELL <a href="' + mediaWikiUrl + '/index.php?curid=' + data.edit.pageid + '" target="_blank">' + titel + '</a> CREATED / EDITED with ' + data.edit.result);
+    });
+
+    return titel;
+
+};
+
 
 //////////////////////////////
 // Hilfsfunktionen          //
@@ -355,8 +407,8 @@ function generateKontaktdaten() {
     var nachname = randomElement(data.nachnamenArray);
     var mail = vorname + '.' + nachname + '@gmail.com';
     mail = mail.split(' ').join('_');
-    var festnetz = '+49' + Math.floor(Math.random() * 89212425716) + 82124257716;
-    var handy = '+49' +Math.floor(Math.random() * 89212425716) + 82124257716;
+    var festnetz = '+49' + (Math.floor(Math.random() * 89212425716) + 82124257716);
+    var handy = '+49' + (Math.floor(Math.random() * 89212425716) + 82124257716);
     var strasse = randomElement(data.vornamenArray) + ' Platz ' + Math.floor(Math.random() * 200) + 1;
     var ort = randomElement(data.ortArray);
     var plz = Math.floor(Math.random() * 90000) + 10000;

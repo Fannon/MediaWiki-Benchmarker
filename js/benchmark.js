@@ -164,6 +164,8 @@ function benchmarkPage(page, currentCounter, currentInterval) {
 
     setTimeout(function () {
 
+        // TODO: Wenn Intervall zu kurz dann addiert er nur noch auf!
+
         var now = new Date().getTime();
 
         $.post(mediaWikiUrl + '/api.php?', {
