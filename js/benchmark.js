@@ -26,7 +26,8 @@ var progressTotal = 0;
 var dataArray = [];
 var dataObject = {
     data: {},
-    analysis: {}
+    analysis: {},
+    timer: {}
 };
 
 
@@ -50,7 +51,8 @@ var reset = function () {
     ]; // 2 Dim Array
     dataObject = {
         data: {},
-        analysis: {}
+        analysis: {},
+        timer: {}
     };
     progress = 0;
     currentCounter = 0;
@@ -89,6 +91,8 @@ var runBenchmark = function () {
     // Reset currentCounter
     reset();
 
+    dataObject.timer.benchmarkStart = new Date().getTime() / 1000;
+
     // Get Pages Input
     var pages = $('#pages').val();
     if (!pages || pages === '') {
@@ -123,6 +127,7 @@ var runBenchmark = function () {
         dataArray[0].push(pages[i]);
         dataObject.data[pages[i]] = [];
         dataObject.analysis[pages[i]] = {};
+        dataObject.timer[pages[i]] = {};
     }
 
     // Iterate currentCounter
@@ -164,11 +169,9 @@ function benchmarkPage(page, currentCounter, currentInterval) {
 
     setTimeout(function () {
 
-        // TODO: Wenn Intervall zu kurz dann addiert er nur noch auf!
-
         var now = new Date().getTime();
 
-        $.post(mediaWikiUrl + '/api.php?', {
+        $.getJSON(mediaWikiUrl + '/api.php?callback=?', {
             action: 'parse',
             page: page,
             format: 'json'
@@ -179,6 +182,8 @@ function benchmarkPage(page, currentCounter, currentInterval) {
                 console.dir(data);
                 return false;
             }
+
+            // TODO: Warnung wenn Intervall deutlich unter Response Time liegt -> Browser delayt Requests!
 
             var then = new Date().getTime();
             var time = then - now;
@@ -195,9 +200,12 @@ function benchmarkPage(page, currentCounter, currentInterval) {
 
             // If completed, draw Chart
             if (percent >= 100) {
+                dataObject.timer.benchmarkEnd = new Date().getTime() / 1000;
                 drawChart();
                 drawData();
             }
+
+            return true;
 
         });
 
@@ -207,6 +215,7 @@ function benchmarkPage(page, currentCounter, currentInterval) {
 
 }
 
+
 function purgePage(page, currentCounter, currentInterval) {
     "use strict";
 
@@ -214,7 +223,7 @@ function purgePage(page, currentCounter, currentInterval) {
 
         var now = new Date().getTime();
 
-        $.post(mediaWikiUrl + '/api.php?', {
+        $.getJSON(mediaWikiUrl + '/api.php?callback=?', {
             action: 'purge',
             page: page,
             format: 'json'
