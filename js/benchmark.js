@@ -1,30 +1,36 @@
 /* jshint jquery: true, devel: true */
 /* global google, ss */
 
+var mwb = {}; // Global Namespace
+
 
 //////////////////////////////
-// Variables and Options    //
+// Options                  //
 //////////////////////////////
 
-/** (Default) URL to MediaWiki Installation */
-var mediaWikiUrl = 'http://localhost/wiki/';
-var purgePages = false;
-var purgeInterval = 300;
+mwb.options = {
+    mediaWikiUrl: 'http://localhost/wiki/',
+    maxCounter: 5,
+    minRandom: 300,
+    maxRandom: 1000,
 
-var errorOccured = false;
+    purgePages: false,
+    purgeInterval: 300
+}
 
-var currentInterval = 0;
-var minRandom = 300;
-var maxRandom = 1000;
 
-var currentCounter = 0;
-var maxCounter = 5;
+//////////////////////////////
+// State                    //
+//////////////////////////////
 
-var progress = 0;
-var progressTotal = 0;
+mwb.warningSent = false;
+mwb.currentInterval = 0;
+mwb.currentCounter = 0;
+mwb.progress = 0;
+mwb.progressTotal = 0;
 
-var dataArray = [];
-var dataObject = {
+mwb.dataArray = [];
+mwb.dataObject = {
     data: {},
     analysis: {},
     timer: {}
@@ -40,24 +46,24 @@ google.load("visualization", "1", {packages: ["corechart"]});
 /**
  * Resets the state of the tool
  */
-var reset = function () {
+mwb.reset = function () {
     "use strict";
 
     console.log('Resetting');
 
     // Reset Variables / Data
-    dataArray = [
+    mwb.dataArray = [
         []
     ]; // 2 Dim Array
-    dataObject = {
+    mwb.dataObject = {
         data: {},
         analysis: {},
         timer: {}
     };
-    progress = 0;
-    currentCounter = 0;
-    currentInterval = 0;
-    errorOccured = false;
+    mwb.progress = 0;
+    mwb.currentCounter = 0;
+    mwb.currentInterval = 0;
+    mwb.warningSent = false;
 
     // Reset Interface
     $('#progress').attr("aria-valuenow", 0).css('width', 0 + '%');
@@ -68,11 +74,11 @@ var reset = function () {
 $(function () {
     "use strict";
     console.log('MediaWiki Benchmark Script ready!');
-    $('#mediaWikiUrl').val(mediaWikiUrl);
-    $('#maxCounter').val(maxCounter);
-    $('#minRandom').val(minRandom);
-    $('#maxRandom').val(maxRandom);
-    $('#purgeInterval').val(purgeInterval);
+    $('#mediaWikiUrl').val(mwb.options.mediaWikiUrl);
+    $('#maxCounter').val(mwb.options.maxCounter);
+    $('#minRandom').val(mwb.options.minRandom);
+    $('#maxRandom').val(mwb.options.maxRandom);
+    $('#purgeInterval').val(mwb.options.purgeInterval);
 });
 
 
@@ -83,15 +89,15 @@ $(function () {
 /**
  * Prepares and launches the Benchmark
  */
-var runBenchmark = function () {
+mwb.runBenchmark = function () {
     "use strict";
 
     console.log('STARTING A NEW BENCHMARK');
 
-    // Reset currentCounter
-    reset();
+    // Reset mwb.currentCounter
+    mwb.reset();
 
-    dataObject.timer.benchmarkStart = new Date().getTime() / 1000;
+    mwb.dataObject.timer.benchmarkStart = new Date().getTime() / 1000;
 
     // Get Pages Input
     var pages = $('#pages').val();
@@ -101,56 +107,47 @@ var runBenchmark = function () {
     pages = pages.split(', ');
 
     // Get current Form Values
-    mediaWikiUrl = $('#mediaWikiUrl').val();
-    maxCounter = parseInt($('#maxCounter').val(), 10);
-    minRandom = parseInt($('#minRandom').val(), 10);
-    maxRandom = parseInt($('#maxRandom').val(), 10);
-    purgeInterval = parseInt($('#purgeInterval').val(), 10);
-    purgePages = $('#purgePages').prop('checked');
+    mwb.options.mediaWikiUrl = $('#mediaWikiUrl').val();
+    mwb.options.maxCounter = parseInt($('#maxCounter').val(), 10);
+    mwb.options.minRandom = parseInt($('#minRandom').val(), 10);
+    mwb.options.maxRandom = parseInt($('#maxRandom').val(), 10);
+    mwb.options.purgeInterval = parseInt($('#purgeInterval').val(), 10);
+    mwb.options.purgePages = $('#purgePages').prop('checked');
 
-    progressTotal = maxCounter * pages.length;
+    mwb.progressTotal = mwb.options.maxCounter * pages.length;
 
-    dataObject.options = {
-        mediaWikiUrl: mediaWikiUrl,
-        maxCounter: maxCounter,
-        minRandom: minRandom,
-        maxRandom: maxRandom,
-        purgePages: purgePages,
-        purgeInterval: purgeInterval,
-        progressTotal: progressTotal
+    // Dump current Settings to dataObject
+    mwb.dataObject.options = mwb.options;
 
-    };
-
-    dataArray[0][0] = 'Iteration';
+    mwb.dataArray[0][0] = 'Iteration';
 
     for (var i = 0; i < pages.length; i++) {
-        dataArray[0].push(pages[i]);
-        dataObject.data[pages[i]] = [];
-        dataObject.analysis[pages[i]] = {};
-        dataObject.timer[pages[i]] = {};
+        mwb.dataArray[0].push(pages[i]);
+        mwb.dataObject.data[pages[i]] = [];
+        mwb.dataObject.analysis[pages[i]] = {};
+        mwb.dataObject.timer[pages[i]] = {};
     }
 
-    // Iterate currentCounter
-    for (currentCounter = 1; currentCounter <= maxCounter; currentCounter++) {
+    // Iterate mwb.currentCounter
+    for (mwb.currentCounter = 1; mwb.currentCounter <= mwb.options.maxCounter; mwb.currentCounter++) {
 
-        dataArray[currentCounter] = [];
-        dataArray[currentCounter].push(currentCounter);
+        mwb.dataArray[mwb.currentCounter] = [];
+        mwb.dataArray[mwb.currentCounter].push(mwb.currentCounter);
 
         // Iterate Pages
         for (var j = 0; j < pages.length; j++) {
 
-            currentInterval += Math.floor(Math.random() * (maxRandom-minRandom) + minRandom);
+            mwb.currentInterval += Math.floor(Math.random() * (mwb.options.maxRandom - mwb.options.minRandom) + mwb.options.minRandom);
             var page = pages[j];
-            console.log('Benchmarking ' + page + ' after interval ' + currentInterval + ' Count: ' + currentCounter);
+            console.log('Benchmarking ' + page + ' after interval ' + mwb.currentInterval + ' Count: ' + mwb.currentCounter);
 
-            if (purgePages) {
-
-                purgePage(page, currentCounter, currentInterval);
-                currentInterval += purgeInterval;
-
+            // If Option "Purge Pages" is set: Add another Delay to the interval and purge the page
+            if (mwb.options.purgePages) {
+                mwb.purgePage(page, mwb.currentCounter, mwb.currentInterval);
+                mwb.currentInterval += mwb.options.purgeInterval;
             }
 
-            benchmarkPage(page, currentCounter, currentInterval);
+            mwb.benchmarkPage(page, mwb.currentCounter, mwb.currentInterval);
 
         }
     }
@@ -160,25 +157,25 @@ var runBenchmark = function () {
 /**
  * Benchmarks a Page after a given time interval
  *
- * @param  {String} page            [description]
- * @param  {Number} currentCounter  [description]
- * @param  {Number} currentInterval [description]
+ * @param  {String} page            Page to benchmark
+ * @param  {Number} currentCounter
+ * @param  {Number} currentInterval
  */
-function benchmarkPage(page, currentCounter, currentInterval) {
+mwb.benchmarkPage = function(page, currentCounter, currentInterval) {
     "use strict";
 
     setTimeout(function () {
 
         var now = new Date().getTime();
 
-        $.getJSON(mediaWikiUrl + '/api.php?callback=?', {
+        $.getJSON(mwb.options.mediaWikiUrl + '/api.php?callback=?', {
             action: 'parse',
             page: page,
             format: 'json'
         }, function (data) {
 
             if (data.error) {
-                log('API ERROR: "' + data.error.code + '" - ' + data.error.info);
+                mwb.log('API ERROR: "' + data.error.code + '" - ' + data.error.info);
                 console.dir(data);
                 return false;
             }
@@ -190,19 +187,26 @@ function benchmarkPage(page, currentCounter, currentInterval) {
 
             console.log('[' + currentCounter + '] Page ' + page + ' loaded in ' + time + 'ms.');
 
-            dataArray[currentCounter].push(time);
-            dataObject.data[page].push(time);
+            mwb.dataArray[currentCounter].push(time);
+            mwb.dataObject.data[page].push(time);
 
-            // Progress Bar
-            progress += 1;
-            var percent = progress / progressTotal * 100;
+            // mwb.progress Bar
+            mwb.progress += 1;
+            var percent = mwb.progress / mwb.progressTotal * 100;
             $('#progress').attr("aria-valuenow", percent).css('width', percent + '%');
 
             // If completed, draw Chart
             if (percent >= 100) {
-                dataObject.timer.benchmarkEnd = new Date().getTime() / 1000;
-                drawChart();
-                drawData();
+                mwb.dataObject.timer.benchmarkEnd = new Date().getTime() / 1000;
+                mwb.drawChart();
+                mwb.drawData();
+            }
+
+            if (time > mwb.options.minRandom && !mwb.warningSent) {
+                var msg = 'Warning: Server could be responding slower than the Browser requesting pages!<br>';
+                msg += 'This can lead to stacked up benchmark results caused by the connection Limit of the Browser.'
+                mwb.log(msg);
+                mwb.warningSent = true;
             }
 
             return true;
@@ -215,22 +219,28 @@ function benchmarkPage(page, currentCounter, currentInterval) {
 
 }
 
-
-function purgePage(page, currentCounter, currentInterval) {
+/**
+ * Purges a Page (Removes Caching) after a given time interval
+ *
+ * @param  {String} page            Page to benchmark
+ * @param  {Number} currentCounter
+ * @param  {Number} currentInterval
+ */
+mwb.purgePage = function(page, currentCounter, currentInterval) {
     "use strict";
 
     setTimeout(function () {
 
         var now = new Date().getTime();
 
-        $.getJSON(mediaWikiUrl + '/api.php?callback=?', {
+        $.post(mwb.options.mediaWikiUrl + '/api.php?callback=?', {
             action: 'purge',
             page: page,
             format: 'json'
         }, function (data) {
 
             if (data.error) {
-                log('API ERROR: "' + data.error.code + '" - ' + data.error.info);
+                mwb.log('API ERROR: "' + data.error.code + '" - ' + data.error.info);
                 console.dir(data);
                 return false;
             }
@@ -254,7 +264,7 @@ function purgePage(page, currentCounter, currentInterval) {
  *
  * Uses http://macwright.org/simple-statistics/ for Statistical Analysis
  */
-function drawData() {
+mwb.drawData = function() {
     "use strict";
 
 
@@ -263,11 +273,11 @@ function drawData() {
     // Analyze Data & draw the Table
     var html = '';
 
-    $.each(dataObject.data, function (key, value) {
+    $.each(mwb.dataObject.data, function (key, value) {
 
         console.log(key + ' : ' + value);
 
-        var row = dataObject.data[key];
+        var row = mwb.dataObject.data[key];
 
         var analysis = {};
 
@@ -280,57 +290,56 @@ function drawData() {
 
         console.dir(analysis);
 
-
         html += '<tr><td>' + key + '</td><td>' + analysis.avg + '</td><td>' + analysis.min + '</td><td>';
         html += analysis.max + '</td><td>' + analysis.standard_deviation + '</td></tr>';
 
-        dataObject.analysis[key] = analysis;
+        mwb.dataObject.analysis[key] = analysis;
 
     });
 
     $('#data-tbody').html(html);
-    console.dir(dataObject);
+    console.dir(mwb.dataObject);
 
-    // JSON Export: dataArray
+    // JSON Export: mwb.dataArray
     var jsonExport = $('#jsonExport');
     jsonExport.removeAttr("disabled");
-    jsonExport.attr('href', ('data:text/json;base64,' + btoa(JSON.stringify(dataArray))));
-    jsonExport.attr("download", getTime() + "_ArrayData.json");
+    jsonExport.attr('href', ('data:text/json;base64,' + btoa(JSON.stringify(mwb.dataArray))));
+    jsonExport.attr("download", mwb.getFormattedTime() + "_ArrayData.json");
 
 
-    // JSON Export: dataObject
+    // JSON Export: mwb.dataObject
     var jsonExportAlt = $('#jsonExportAlt');
     jsonExportAlt.removeAttr("disabled");
-    jsonExportAlt.attr('href', ('data:text/json;base64,' + btoa(JSON.stringify(dataObject))));
-    jsonExportAlt.attr("download", getTime() + "_ObjectData.json");
+    jsonExportAlt.attr('href', ('data:text/json;base64,' + btoa(JSON.stringify(mwb.dataObject))));
+    jsonExportAlt.attr("download", mwb.getFormattedTime() + "_ObjectData.json");
 
 
     // CSV Export
     var csvExport = $('#csvExport');
     csvExport.removeAttr("disabled");
-    csvExport.attr("href", 'data:text/csv;base64,' + btoa(convertToCSV(dataArray)));
-    csvExport.attr("download", getTime() + "_TableData.csv");
+    csvExport.attr("href", 'data:text/csv;base64,' + btoa(mwb.convertToCSV(mwb.dataArray)));
+    csvExport.attr("download", mwb.getFormattedTime() + "_TableData.csv");
 
     // SVG Export
     var svgExport = $('#svgExport');
     svgExport.removeAttr("disabled");
     svgExport.attr("href", 'data:text/svg;base64,' + btoa($('#chart_div div div').html()));
-    svgExport.attr("download", getTime() + "_Graph.svg");
+    svgExport.attr("download", mwb.getFormattedTime() + "_Graph.svg");
 
 
 }
 
 /**
- * Draw the Chart from Benchmark Data
- * Uses Google Chart
+ * Draws the Chart from benchmarked Data
+ * Uses Google Chart Library: https://developers.google.com/chart/
  */
-function drawChart() {
+mwb.drawChart = function () {
     "use strict";
 
     console.log('Plotting Graph');
-    console.dir(dataArray);
+    console.dir(mwb.dataArray);
 
-    var data = google.visualization.arrayToDataTable(dataArray);
+    var data = google.visualization.arrayToDataTable(mwb.dataArray);
 
     var options = {
 
@@ -357,8 +366,15 @@ function drawChart() {
 // Helper Functions         //
 //////////////////////////////
 
-// http://stackoverflow.com/questions/11257062/converting-json-object-to-csv-format-in-javascript
-function convertToCSV(objArray) {
+/**
+ *  Converts an Array to a (Excel compatible) CSV String
+ *
+ * Adapted from:
+ * http://stackoverflow.com/questions/11257062/converting-json-object-to-csv-format-in-javascript
+ * @param  {Array}  objArray Input Array
+ * @return {String}          CSV String
+ */
+mwb.convertToCSV = function(objArray) {
     "use strict";
 
     var array = typeof objArray !== 'object' ? JSON.parse(objArray) : objArray;
@@ -385,12 +401,11 @@ function convertToCSV(objArray) {
 
 /**
  * Pads a Number
- * @param n
- * @returns {string}
+ * @param n             Number to Pad
+ * @returns {string}    Padded Number
  */
-function pad(n) {
+mwb.pad = function(n) {
     "use strict";
-
     return n < 10 ? '0' + n : n;
 }
 
@@ -398,47 +413,30 @@ function pad(n) {
  * Write a Message to the Message Div
  * @param msg
  */
-function log(msg) {
+mwb.log = function(msg) {
     "use strict";
 
     var currentdate = new Date();
-    var time = pad(currentdate.getHours()) + ":" + pad(currentdate.getMinutes()) + ":" + pad(currentdate.getSeconds());
+    var time = mwb.pad(currentdate.getHours()) + ":" + mwb.pad(currentdate.getMinutes()) + ":" + mwb.pad(currentdate.getSeconds());
     $('#msg').append('<div class="alert alert-warning">[' + time + '] ' + msg + '<a class="close" data-dismiss="alert" href="#" aria-hidden="true">&times;</a></div>');
     $(".alert").alert();
 }
 
 /**
- * Get Random Element from Array -> jQuery Function
- */
-(function ($) {
-    "use strict";
-
-    $.rand = function (arg) {
-        if ($.isArray(arg)) {
-            return arg[$.rand(arg.length)];
-        } else if (typeof arg === "number") {
-            return Math.floor(Math.random() * arg);
-        } else {
-            return 4;  // chosen by fair dice roll
-        }
-    };
-})(jQuery);
-
-/**
  * Returns a DateString
  * @return {String}           [description]
  */
-function getTime() {
+mwb.getFormattedTime = function() {
     "use strict";
 
     var a = new Date();
 
     var year = a.getFullYear();
-    var month = pad(a.getMonth());
-    var date = pad(a.getDate());
-    var hour = pad(a.getHours());
-    var min = pad(a.getMinutes());
-    var sec = pad(a.getSeconds());
+    var month = mwb.pad(a.getMonth());
+    var date = mwb.pad(a.getDate());
+    var hour = mwb.pad(a.getHours());
+    var min = mwb.pad(a.getMinutes());
+    var sec = mwb.pad(a.getSeconds());
 
     return year + '-' + month + '-' + date + '_' + hour + ':' + min + ':' + sec;
 }
