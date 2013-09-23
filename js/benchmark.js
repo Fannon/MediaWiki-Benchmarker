@@ -76,6 +76,7 @@ mwb.reset = function () {
     $('#progress').attr("aria-valuenow", 0).css('width', 0 + '%');
     $('#chart_div').html('');
     $('#data-tbody').html('');
+    $('#progresstext').html('');
 };
 
 $(function () {
@@ -104,7 +105,8 @@ mwb.runBenchmark = function () {
     // Reset mwb.currentCounter
     mwb.reset();
 
-    mwb.dataObject.timer.benchmarkStart = new Date().getTime() / 1000;
+    mwb.dataObject.timer.benchmarkStartUnix = Math.floor(new Date().getTime() / 1000);
+    mwb.dataObject.timer.benchmarkStartFormatted = mwb.getFormattedTime();
 
     // Get Pages Input
     var pages = $('#pages').val();
@@ -132,7 +134,6 @@ mwb.runBenchmark = function () {
         mwb.dataArray[0].push(pages[i]);
         mwb.dataObject.data[pages[i]] = [];
         mwb.dataObject.analysis[pages[i]] = {};
-        mwb.dataObject.timer[pages[i]] = {};
     }
 
     // Iterate mwb.currentCounter
@@ -193,7 +194,10 @@ mwb.benchmarkPage = function(page, currentCounter, currentInterval) {
             var then = new Date().getTime();
             var time = then - now;
 
-            console.log('[' + currentCounter + '] Page ' + page + ' loaded in ' + time + 'ms.');
+            var html = 'STATUS: [' + currentCounter + ']: ' + page + ' loaded in ' + time + 'ms.';
+
+            $('#progresstext').html(html);
+            console.log(html);
 
             mwb.dataArray[currentCounter].push(time);
             mwb.dataObject.data[page].push(time);
@@ -205,7 +209,9 @@ mwb.benchmarkPage = function(page, currentCounter, currentInterval) {
 
             // If completed, draw Chart
             if (percent >= 100) {
-                mwb.dataObject.timer.benchmarkEnd = new Date().getTime() / 1000;
+                mwb.dataObject.timer.benchmarkEndUnix = Math.floor(new Date().getTime() / 1000);
+                mwb.dataObject.timer.benchmarkEndFormatted = mwb.getFormattedTime();
+                $('#progresstext').html('');
                 mwb.drawChart();
                 mwb.drawData();
             }
