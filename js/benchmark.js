@@ -1,5 +1,12 @@
-/* jshint jquery: true, devel: true */
-/* global google, ss */
+/*jshint jquery: true, devel: true */
+/*global google, ss */
+
+///////////////////////////////////////////////////
+// MediaWiki Benchmark Script                    //
+///////////////////////////////////////////////////
+// 2013 by Simon Heimler                         //
+// https://github.com/Fannon/MediaWiki-Benchmark //
+///////////////////////////////////////////////////
 
 var mwb = {}; // Global Namespace
 
@@ -11,12 +18,12 @@ var mwb = {}; // Global Namespace
 mwb.options = {
     mediaWikiUrl: 'http://localhost/wiki/',
     maxCounter: 5,
-    minRandom: 300,
-    maxRandom: 1000,
+    minRandom: 3000,
+    maxRandom: 5000,
 
     purgePages: false,
     purgeInterval: 300
-}
+};
 
 
 //////////////////////////////
@@ -151,6 +158,7 @@ mwb.runBenchmark = function () {
 
         }
     }
+    return true;
 };
 
 
@@ -203,8 +211,9 @@ mwb.benchmarkPage = function(page, currentCounter, currentInterval) {
             }
 
             if (time > mwb.options.minRandom && !mwb.warningSent) {
-                var msg = 'Warning: Server could be responding slower than the Browser requesting pages!<br>';
-                msg += 'This can lead to stacked up benchmark results caused by the connection Limit of the Browser.'
+                var msg = 'Warning: Server could be responding slower than the Browser is requesting the pages!<br>';
+                msg += 'This can lead to added up benchmark results which are caused by the connection Limit of the Browser. <a href="img/ConnectionQueueWarning.png" target="_blank">Example</a>)<br>';
+                msg += 'To avoid this increase the Minimum Random Intervall higher than the expected Response time.';
                 mwb.log(msg);
                 mwb.warningSent = true;
             }
@@ -217,7 +226,7 @@ mwb.benchmarkPage = function(page, currentCounter, currentInterval) {
 
     return true;
 
-}
+};
 
 /**
  * Purges a Page (Removes Caching) after a given time interval
@@ -250,13 +259,15 @@ mwb.purgePage = function(page, currentCounter, currentInterval) {
 
             console.info('[' + currentCounter + '] Page ' + page + ' purged in ' + time + 'ms.');
 
+            return true;
+
         });
 
     }, currentInterval);
 
     return true;
 
-}
+};
 
 /**
  * Analyzes the Data and generates a summary table
@@ -327,7 +338,7 @@ mwb.drawData = function() {
     svgExport.attr("download", mwb.getFormattedTime() + "_Graph.svg");
 
 
-}
+};
 
 /**
  * Draws the Chart from benchmarked Data
@@ -359,7 +370,7 @@ mwb.drawChart = function () {
     // var chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
     var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
     chart.draw(data, options);
-}
+};
 
 
 //////////////////////////////
@@ -397,7 +408,7 @@ mwb.convertToCSV = function(objArray) {
     }
 
     return str;
-}
+};
 
 /**
  * Pads a Number
@@ -407,7 +418,7 @@ mwb.convertToCSV = function(objArray) {
 mwb.pad = function(n) {
     "use strict";
     return n < 10 ? '0' + n : n;
-}
+};
 
 /**
  * Write a Message to the Message Div
@@ -420,7 +431,7 @@ mwb.log = function(msg) {
     var time = mwb.pad(currentdate.getHours()) + ":" + mwb.pad(currentdate.getMinutes()) + ":" + mwb.pad(currentdate.getSeconds());
     $('#msg').append('<div class="alert alert-warning">[' + time + '] ' + msg + '<a class="close" data-dismiss="alert" href="#" aria-hidden="true">&times;</a></div>');
     $(".alert").alert();
-}
+};
 
 /**
  * Returns a DateString
@@ -432,11 +443,11 @@ mwb.getFormattedTime = function() {
     var a = new Date();
 
     var year = a.getFullYear();
-    var month = mwb.pad(a.getMonth());
+    var month = mwb.pad(a.getMonth() + 1);
     var date = mwb.pad(a.getDate());
     var hour = mwb.pad(a.getHours());
     var min = mwb.pad(a.getMinutes());
     var sec = mwb.pad(a.getSeconds());
 
-    return year + '-' + month + '-' + date + '_' + hour + ':' + min + ':' + sec;
-}
+    return year + '-' + month + '-' + date + '_-_' + hour + ':' + min + ':' + sec;
+};
