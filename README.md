@@ -1,7 +1,10 @@
 MediaWiki-Benchmark
 ===================
 This is a simple Script to benchmark MediaWiki Installations. It runs completely in the Browser and can be used locally or uploaded to the server in case of cross-origin-issues.
+
 After a successful Benchmark it lets you export the Data in CSV, JSON and SVG formats. (This may only work on recent Browsers. Tested in Google Chrome)
+
+![Screenshot](http://up.fannon.de/img/2013-09-23_-_09-06-47.png "Screenshot of MediaWiki Benchmark")
 
 ###Options###
 There are several options. Most important are:
@@ -11,3 +14,4 @@ There are several options. Most important are:
 
 ###Known Problems###
 The Browser has a limitation of max opened connections. So if you set up the options be careful that the script doesn't make new Requests faster than the Server can answer them. If you do, the Requests will stack up and so will the time that is measured.
+
