@@ -163,10 +163,30 @@
       <div class="modal-content">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-          <h4 class="modal-title">Help</h4>
+          <h3 class="modal-title">Info & Help</h3>
         </div>
         <div class="modal-body">
-          ...
+
+            <p>This is a simple Script to benchmark MediaWiki Installations. It runs completely in the Browser and can be used locally or uploaded to the server in case of cross-origin-issues.</p>
+
+            <p>After a successful Benchmark it lets you export the Data in CSV, JSON and SVG formats. (This may only work on recent Browsers. Tested in Google Chrome)</p>
+
+            <h4>
+            <a name="options" class="anchor" href="#options"><span class="octicon octicon-link"></span></a>Options</h4>
+
+            <p>There are several options. Most important are:</p>
+
+            <ul>
+            <li>
+            <em>pages</em>: A comma seperated of MediaWiki pages. E.g. Main Site, JavaScript, GIT</li>
+            <li>
+            <em>iterations</em>: This is the number each page is benchmarked</li>
+            <li>
+            <em>Random Intervals</em>: The Script will wait for another Benchmark Request a random time. You can set the minimum time and maximum time. If you set both to the same value there is no randomness.</li>
+            </ul><h4>
+            <a name="known-problems" class="anchor" href="#known-problems"><span class="octicon octicon-link"></span></a>Known Problems</h4>
+
+            <p>The Browser has a limitation of max opened connections. So if you set up the options be careful that the script doesn't make new Requests faster than the Server can answer them. If you do, the Requests will stack up and so will the time that is measured.</p>
         </div>
       </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
