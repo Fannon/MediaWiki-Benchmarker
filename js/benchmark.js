@@ -333,11 +333,14 @@ function drawChart() {
     var data = google.visualization.arrayToDataTable(dataArray);
 
     var options = {
-        title: 'Page Performance (ms)',
+
         theme: 'maximized',
-        focusTarget: 'category',
         vAxis: {
+
             minValue: 0
+        },
+        hAxis: {
+
         },
         pointSize: 2,
         lineWidth: 1
