@@ -18,7 +18,7 @@ var mwb = {}; // Global Namespace
 mwb.options = {
     mediaWikiUrl: 'http://localhost/wiki/',
     maxCounter: 5,
-    minRandom: 3000,
+    minRandom: 4000,
     maxRandom: 5000,
 
     purgePages: false,
@@ -111,6 +111,7 @@ mwb.runBenchmark = function () {
     // Get Pages Input
     var pages = $('#pages').val();
     if (!pages || pages === '') {
+        mwb.log('No Pages to benchmark.');
         return false;
     }
     pages = pages.split(', ');
@@ -136,6 +137,8 @@ mwb.runBenchmark = function () {
         mwb.dataObject.analysis[pages[i]] = {};
     }
 
+    console.log('INFO: Queuing Benchmarks. ' + pages.length + ' Pages with ' + mwb.options.maxCounter  + ' Iterations = ' + pages.length*mwb.options.maxCounter + ' Operations.');
+
     // Iterate mwb.currentCounter
     for (mwb.currentCounter = 1; mwb.currentCounter <= mwb.options.maxCounter; mwb.currentCounter++) {
 
@@ -145,17 +148,17 @@ mwb.runBenchmark = function () {
         // Iterate Pages
         for (var j = 0; j < pages.length; j++) {
 
-            mwb.currentInterval += Math.floor(Math.random() * (mwb.options.maxRandom - mwb.options.minRandom) + mwb.options.minRandom);
             var page = pages[j];
-            console.log('Benchmarking ' + page + ' after interval ' + mwb.currentInterval + ' Count: ' + mwb.currentCounter);
 
             // If Option "Purge Pages" is set: Add another Delay to the interval and purge the page
-            if (mwb.options.purgePages) {
-                mwb.purgePage(page, mwb.currentCounter, mwb.currentInterval);
-                mwb.currentInterval += mwb.options.purgeInterval;
-            }
+//            if (mwb.options.purgePages) {
+//                mwb.purgePage(page, mwb.currentCounter, mwb.currentInterval);
+//                mwb.currentInterval += mwb.options.purgeInterval;
+//            }
 
             mwb.benchmarkPage(page, mwb.currentCounter, mwb.currentInterval);
+//            console.log('Added to Benchmark Queue: ' + page + ' after interval ' + mwb.currentInterval + ' Count: ' + mwb.currentCounter);
+            mwb.currentInterval += Math.floor(Math.random() * (mwb.options.maxRandom - mwb.options.minRandom) + mwb.options.minRandom);
 
         }
     }
@@ -189,15 +192,8 @@ mwb.benchmarkPage = function(page, currentCounter, currentInterval) {
                 return false;
             }
 
-            // TODO: Warnung wenn Intervall deutlich unter Response Time liegt -> Browser delayt Requests!
-
             var then = new Date().getTime();
             var time = then - now;
-
-            var html = 'STATUS: [' + currentCounter + ']: ' + page + ' loaded in ' + time + 'ms.';
-
-            $('#progresstext').html(html);
-            console.log(html);
 
             mwb.dataArray[currentCounter].push(time);
             mwb.dataObject.data[page].push(time);
@@ -207,24 +203,26 @@ mwb.benchmarkPage = function(page, currentCounter, currentInterval) {
             var percent = mwb.progress / mwb.progressTotal * 100;
             $('#progress').attr("aria-valuenow", percent).css('width', percent + '%');
 
+            var html = Math.round(percent) + '% | Latest Result: [' + currentCounter + ']: ' + page + ' loaded in ' + time + 'ms.';
+            $('#progresstext').html(html);
+            console.log(html);
+
+            if (time > mwb.options.minRandom && !mwb.warningSent) {
+                var msg = 'Warning: The MediaWiki Installation could be responding slower than the Browser is requesting the pages!<br>';
+                msg += 'This can lead to added up benchmark results which are caused by the connection Limit of the Browser. <a href="img/ConnectionQueueWarning.png" target="_blank">Example</a>)<br>';
+                msg += 'To avoid this increase the Minimum Random Intervall so that it is higher than the expected Response time.';
+                mwb.log(msg);
+                mwb.warningSent = true;
+            }
+
             // If completed, draw Chart
-            if (percent >= 100) {
+            if (mwb.progress === mwb.progressTotal) {
                 mwb.dataObject.timer.benchmarkEndUnix = Math.floor(new Date().getTime() / 1000);
                 mwb.dataObject.timer.benchmarkEndFormatted = mwb.getFormattedTime();
                 $('#progresstext').html('');
                 mwb.drawChart();
                 mwb.drawData();
             }
-
-            if (time > mwb.options.minRandom && !mwb.warningSent) {
-                var msg = 'Warning: Server could be responding slower than the Browser is requesting the pages!<br>';
-                msg += 'This can lead to added up benchmark results which are caused by the connection Limit of the Browser. <a href="img/ConnectionQueueWarning.png" target="_blank">Example</a>)<br>';
-                msg += 'To avoid this increase the Minimum Random Intervall higher than the expected Response time.';
-                mwb.log(msg);
-                mwb.warningSent = true;
-            }
-
-            return true;
 
         });
 
@@ -435,7 +433,7 @@ mwb.log = function(msg) {
 
     var currentdate = new Date();
     var time = mwb.pad(currentdate.getHours()) + ":" + mwb.pad(currentdate.getMinutes()) + ":" + mwb.pad(currentdate.getSeconds());
-    $('#msg').append('<div class="alert alert-warning">[' + time + '] ' + msg + '<a class="close" data-dismiss="alert" href="#" aria-hidden="true">&times;</a></div>');
+    $('#msg').append('<div class="alert alert-warning"><a class="close" data-dismiss="alert" href="#" aria-hidden="true">&times;</a>[' + time + '] ' + msg + '</div>');
     $(".alert").alert();
 };
 
