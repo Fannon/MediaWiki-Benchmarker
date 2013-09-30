@@ -7,6 +7,13 @@ You can try/use it online: http://fannon.de/tools/mediawiki-benchmark/
 
 After a successful Benchmark it lets you export the Data in CSV, JSON and SVG formats. (This may only work on recent Browsers. Tested in Google Chrome)
 
+Eventually you have to enable the API in your LocalSettings.php:
+```ini
+#### API
+$wgEnableAPI = true;
+$wgEnableWriteAPI = true;
+```
+
 ![Screenshot](http://up.fannon.de/img/2013-09-23_-_09-06-47.png "Screenshot of MediaWiki Benchmark")
 
 ###Options###
