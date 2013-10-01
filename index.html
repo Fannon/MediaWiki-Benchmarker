@@ -28,14 +28,11 @@
 
         <div id="msg"></div>
 
-        <h3>Options</h3>
+        <!-- <h3>Options</h3> -->
 
         <div class="row">
             <div class="col-9">
-                <div class="input-group">
-                    <input id="pages" type="email" class="form-control" placeholder="Comma  Seperated (', '))">
-                    <span class="input-group-addon">Pages</span>
-                </div>
+                <input id="pages" type="email" class="form-control" placeholder="List of Pages: Comma-separated (', '))">
             </div>
 
             <div class="col-2">
@@ -87,7 +84,7 @@
                 </div>
             </div>
         </div>
-        <!--
+
         <br>
 
          <div class="row">
@@ -99,17 +96,11 @@
                 </div>
             </div>
 
-            <div class="col-3">
-                <div class="input-group">
-                    <div class="checkbox">
-                        <label>
-                            <input id="purgePages" type="checkbox"> Purge Pages before retrieving
-                        </label>
-                    </div>
-                </div>
+            <div class="col-9">
+                <input id="notes" class="form-control" placeholder="Notes">
             </div>
 
-        </div> -->
+        </div>
 
         <h3>Progress <small id="progresstext"></small></h3>
 
@@ -150,7 +141,7 @@
         <a id='csvExport' target="_blank" class="btn btn-info" disabled="disabled">Download Data as CSV</a>
         <a id='svgExport' target="_blank" class="btn btn-info" disabled="disabled">Download Graph as SVG</a>
 
-        <div id="footer" class="">2013 - Simon Heimler</div>
+        <div id="footer" class="">2013 - Simon Heimler | Open Source | Repository: <a href="https://github.com/Fannon/MediaWiki-Benchmark">Github</a></div>
 
     </div>
 
@@ -166,8 +157,7 @@
             </div>
             <div class="modal-body">
 
-                <p>This is a simple Script to benchmark MediaWiki Installations. It runs completely in the Browser and
-                    can be used locally or uploaded to the server in case of cross-origin-issues.</p>
+                <p>This is a simple Script to benchmark MediaWiki Installations via API Parse Requests. It runs completely in the Browser and can be used locally or uploaded to the server in case of cross-origin-issues.</p>
 
                 <p>After a successful Benchmark it lets you export the Data in CSV, JSON and SVG formats. (This may only
                     work on recent Browsers. Tested in Google Chrome)</p>
@@ -180,13 +170,13 @@
 
                 <ul>
                     <li>
-                        <em>pages</em>: A comma seperated of MediaWiki pages. E.g. Main Site, JavaScript, GIT
+                        <strong>Pages</strong>: A comma seperated of MediaWiki pages. E.g. Main Site, JavaScript, GIT
                     </li>
                     <li>
-                        <em>iterations</em>: This is the number each page is benchmarked
+                        <strong>Iterations</strong>: This is the number each page is benchmarked
                     </li>
                     <li>
-                        <em>Random Intervals</em>: The Script will wait for another Benchmark Request a random time. You
+                        <strong>Random Intervals</strong>: The Script will wait for another Benchmark Request a random time. You
                         can set the minimum time and maximum time. If you set both to the same value there is no
                         randomness.
                     </li>
@@ -197,7 +187,9 @@
 
                 <p>The Browser has a limitation of max opened connections. So if you set up the options be careful that
                     the script doesn't make new Requests faster than the Server can answer them. If you do, the Requests
-                    will stack up and so will the time that is measured.</p>
+                    will stack up and so will the time that is measured. (<a href="http://stackoverflow.com/questions/18914232/benchmarking-the-time-of-ajax-requests-gets-added-up-when-interval-between-them" target="_blank">Details</a>)</p>
+                <h4>Github</h4>
+                <p>You'll find the code and the issue queue at github.com: <br><a href="https://github.com/Fannon/MediaWiki-Benchmark" target="_blank">Fannon/MediaWiki-Benchmark</a></p>
             </div>
         </div>
         <!-- /.modal-content -->

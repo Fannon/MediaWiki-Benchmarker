@@ -17,12 +17,10 @@ var mwb = {}; // Global Namespace
 
 mwb.options = {
     mediaWikiUrl: 'http://localhost/wiki/',
-    maxCounter: 5,
-    minRandom: 4000,
-    maxRandom: 5000,
-
-    purgePages: false,
-    purgeInterval: 300
+    maxCounter: 20,
+    minRandom: 5000,
+    maxRandom: 7000,
+    purgeInterval: 0
 };
 
 
@@ -77,6 +75,7 @@ mwb.reset = function () {
     $('#chart_div').html('');
     $('#data-tbody').html('');
     $('#progresstext').html('');
+    $('#notes').html('');
 };
 
 $(function () {
@@ -122,7 +121,11 @@ mwb.runBenchmark = function () {
     mwb.options.minRandom = parseInt($('#minRandom').val(), 10);
     mwb.options.maxRandom = parseInt($('#maxRandom').val(), 10);
     mwb.options.purgeInterval = parseInt($('#purgeInterval').val(), 10);
-    mwb.options.purgePages = $('#purgePages').prop('checked');
+    mwb.options.notes = $('#notes').val();
+
+    if (!mwb.options.purgeInterval || mwb.options.purgeInterval === 0) {
+        mwb.options.purgePages = false;
+    }
 
     mwb.progressTotal = mwb.options.maxCounter * pages.length;
 
@@ -151,10 +154,10 @@ mwb.runBenchmark = function () {
             var page = pages[j];
 
             // If Option "Purge Pages" is set: Add another Delay to the interval and purge the page
-//            if (mwb.options.purgePages) {
-//                mwb.purgePage(page, mwb.currentCounter, mwb.currentInterval);
-//                mwb.currentInterval += mwb.options.purgeInterval;
-//            }
+           if (mwb.options.purgePages) {
+               mwb.purgePage(page, mwb.currentCounter, mwb.currentInterval);
+               mwb.currentInterval += mwb.options.purgeInterval;
+           }
 
             mwb.benchmarkPage(page, mwb.currentCounter, mwb.currentInterval);
 //            console.log('Added to Benchmark Queue: ' + page + ' after interval ' + mwb.currentInterval + ' Count: ' + mwb.currentCounter);
@@ -203,9 +206,9 @@ mwb.benchmarkPage = function(page, currentCounter, currentInterval) {
             var percent = mwb.progress / mwb.progressTotal * 100;
             $('#progress').attr("aria-valuenow", percent).css('width', percent + '%');
 
-            var html = Math.round(percent) + '% | Latest Result: [' + currentCounter + ']: ' + page + ' loaded in ' + time + 'ms.';
+            var html = '<span class="badge">' + Math.round(percent) + '%</span> Iteration ' + currentCounter + ', ' + page + ' loaded in ' + time + 'ms.';
+            console.log(Math.round(percent) + '% - Iteration ' + currentCounter + ', ' + page + ' loaded in ' + time + 'ms.');
             $('#progresstext').html(html);
-            console.log(html);
 
             if (time > mwb.options.minRandom && !mwb.warningSent) {
                 var msg = 'Warning: The MediaWiki Installation could be responding slower than the Browser is requesting the pages!<br>';
