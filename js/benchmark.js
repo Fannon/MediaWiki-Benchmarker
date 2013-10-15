@@ -76,6 +76,7 @@ mwb.reset = function () {
     $('#data-tbody').html('');
     $('#progresstext').html('');
     $('#notes').html('');
+    $('#progress-row').hide();
 };
 
 $(function () {
@@ -86,6 +87,8 @@ $(function () {
     $('#minRandom').val(mwb.options.minRandom);
     $('#maxRandom').val(mwb.options.maxRandom);
     $('#purgeInterval').val(mwb.options.purgeInterval);
+
+    $('#progress-row').hide();
 });
 
 
@@ -103,6 +106,7 @@ mwb.runBenchmark = function () {
 
     // Reset mwb.currentCounter
     mwb.reset();
+    $('#progress-row').show();
 
     mwb.dataObject.timer.benchmarkStartUnix = Math.floor(new Date().getTime() / 1000);
     mwb.dataObject.timer.benchmarkStartFormatted = mwb.getFormattedTime();
@@ -285,8 +289,9 @@ mwb.purgePage = function(page, currentCounter, currentInterval) {
 mwb.drawData = function() {
     "use strict";
 
-
     console.log('Analyzing Data');
+
+    $('#progress-row').hide();
 
     // Analyze Data & draw the Table
     var html = '';
