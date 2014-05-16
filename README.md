@@ -3,7 +3,7 @@ MediaWiki-Benchmark
 This is a simple Script to benchmark MediaWiki Installations via the API. 
 It runs completely in the Browser and can be used locally or uploaded to the server in case of cross-origin-issues.
 
-You can try/use it online: http://fannon.de/tools/mediawiki-benchmark/
+You can try/use it online: http://fannon.de/p/mediawiki-benchmark/
 
 After a successful Benchmark it lets you export the Data in CSV, JSON and SVG formats. (This may only work on recent Browsers. Tested in Google Chrome)
 
