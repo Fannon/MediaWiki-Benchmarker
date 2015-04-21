@@ -80,8 +80,8 @@ mwb.resetAll = function() {
 
     // Reset Interface
     $('#messages').html('');
-    $('#bar-chart').html('');
-    $('#boxplot-chart').html('');
+    $('#bar-chart').html('<div class="chart-description">BAR CHART</div>');
+    $('#boxplot-chart').html('<div class="chart-description">BOXPLOT CHART</div>');
     $('#data-tbody').html('');
 
 };
@@ -102,6 +102,7 @@ mwb.resetIteration = function() {
     mwb.totalIterations = 0;
 
     // Reset Interface
+    $('#lastBenchmark').text('');
     $('#progress-bar').attr('aria-valuenow', 0).css('width', 0 + '%').text('');
 
 };
@@ -115,6 +116,7 @@ mwb.getOptions = function() {
     // Get current Form Values
     mwb.options.mediaWikiUrl = $('#mediaWikiUrl').val();
     mwb.options.pageName = $('#pageName').val();
+    mwb.options.note = $('#note').val();
 
     mwb.options.iterations = parseInt($('#iterations').val(), 10);
     mwb.options.minRandom = parseInt($('#minRandom').val(), 10);
@@ -143,6 +145,11 @@ mwb.benchmarkPage = function(pageName) {
 
     // Set Benchmark Run title
     mwb.currentTitle = '#' + mwb.benchmark + ' ' + pageName;
+
+    if (mwb.options.note) {
+        mwb.currentTitle += ' (' + mwb.options.note + ')';
+    }
+
     mwb.benchmarks.push(mwb.currentTitle);
     // Add the title as the first row item
     mwb.dataArray[mwb.benchmark - 1] = [mwb.currentTitle];
@@ -218,11 +225,13 @@ mwb.onPageFetch = function(err, data, time) {
     if (!err) {
 
         console.log('Iteration ' + mwb.currentIteration + ' in ' + time + 'ms');
+        $('#lastBenchmark').text('(' + time + 'ms)');
 
         mwb.dataArray[mwb.benchmark - 1].push(time);
 
         mwb.dataObject.push({
             benchmark: mwb.currentTitle,
+            benchmarkCounter: mwb.benchmark,
             run: mwb.currentIteration + 1,
             time: time
         });
@@ -238,6 +247,7 @@ mwb.onPageFetch = function(err, data, time) {
 
         // If all iterations have run, complete the benchmark run
         if (mwb.currentIteration === mwb.totalIterations) {
+
             var totalTime = (new Date().getTime()) - mwb.startTime;
 
             mwb.drawChart();
@@ -311,17 +321,18 @@ mwb.drawChart = function() {
     $('#bar-chart').html('');
     $('#boxplot-chart').html('');
 
-    var data = mwb.dataObject;
-
     // Bar Chart
     mwb.barChart = d3plus.viz()
         .container('#bar-chart')
-        .data(data)
+        .data(mwb.dataObject)
         .type('bar')
         .id('run')
         .x({
             value: 'benchmark',
-            label: false
+            label: false,
+            grid: false,
+            axis: false,
+            scale: 'discrete'
         })
         .y('time')
         .height(236)
@@ -334,17 +345,18 @@ mwb.drawChart = function() {
     // Box Plot Chart
     mwb.boxPlotChart = d3plus.viz()
         .container('#boxplot-chart')
-        .data(data)
+        .data(mwb.dataObject)
         .type('box')
         .id('run')
         .x({
             value: 'benchmark',
-            label: false
+            label: false,
+            grid: false,
+            axis: false,
+            scale: 'discrete'
         })
-        .y({
-            value: 'time',
-            label: 'TEST'
-        })
+        .y('time')
+        .color('benchmark')
         .timing({
             transitions: 0
         })

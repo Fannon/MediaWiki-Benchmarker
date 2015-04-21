@@ -32,16 +32,15 @@
     </div>
 
     <form id="mwb-options" class="form-inline">
-        <p>
 
-            <div class="form-group ">
-                <input type="url" class="form-control" id="mediaWikiUrl" placeholder="MediaWiki URL"
-                       value="http://en.wikipedia.org/w/api.php" required
-                       data-toggle="tooltip" data-placement="top" title="URL to the MediaWiki API (http://de.wikipedia.org/w/api.php)">
-                <input type="text" class="form-control" id="pageName" placeholder="PageName" value="Main Page" required
-                       data-toggle="tooltip" data-placement="top" title="Wiki page name">
-            </div>
-        </p>
+        <div class="form-group">
+
+            <input type="url" class="form-control" id="mediaWikiUrl" placeholder="MediaWiki URL"
+                   value="http://en.wikipedia.org/w/api.php" required
+                   data-toggle="tooltip" data-placement="top" title="URL to the MediaWiki API (http://de.wikipedia.org/w/api.php)">
+            <input type="text" class="form-control" id="pageName" placeholder="PageName" value="Main Page" required
+                   data-toggle="tooltip" data-placement="top" title="Wiki page name">
+        </div>
 
         <p>
 
@@ -52,12 +51,14 @@
                        data-toggle="tooltip" data-placement="top" title="Minimum random time inverval (time between requests)">
                 <input type="number" class="form-control" id="maxRandom" placeholder="MaxRandom" value="800" required
                        data-toggle="tooltip" data-placement="top" title="Maximum random time inverval (time between requests)">
+                <input type="text" class="form-control" id="note" placeholder="note" value=""
+                       data-toggle="tooltip" data-placement="top" title="Optional note about the current benchmark run">
                 <button class="btn btn-default btn-danger" id="reset"
                         data-toggle="tooltip" data-placement="top" title="Reset all benchmarked data">
                         Reset Data
                 </button>
                 <button id="startBenchmark" type="submit" class="btn btn-default btn-success"
-                        data-toggle="tooltip" data-placement="top" title="Starts the benchmark. Will append to the existing datasets.">
+                        data-toggle="tooltip" data-placement="top" title="Starts the benchmark; will append to existing data">
                         Start / Add Benchmark
                 </button>
             </div>
@@ -74,10 +75,6 @@
 
     <div class="chartWrapper">
         <div id="boxplot-chart" class="chart"></div>
-    </div>
-
-    <div class="chartWrapper">
-        <div id="scatterplot-chart" class="chart"></div>
     </div>
 
     <div id="data_div" class="chartWrapper">
@@ -105,7 +102,7 @@
     <br>
 
     <div class="footer">
-        <p>2015 - Simon Heimler | Open Source | Repository: <a href="https://github.com/Fannon/MediaWiki-Benchmark">Github</a></p>
+        2015 - Simon Heimler | Open Source | Repository: <a href="https://github.com/Fannon/MediaWiki-Benchmark">Github</a>
     </div>
 </div>
 

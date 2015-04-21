@@ -68,36 +68,37 @@ body {
 }
 
 .container {
-    width: 920px !important;
+    width: 980px !important;
+    max-width: 980px !important;
 }
 
 /* Responsive: Portrait tablets and up */
-@media screen and (min-width: 768px) {
-  .container {
-    max-width: 920px;
-  }
-
-  /* Remove the padding we set earlier */
-  .header,
-  .marketing,
-  .footer {
-    padding-left: 0;
-    padding-right: 0;
-  }
-
-  /* Space out the masthead */
-  .header {
-    margin-bottom: 30px;
-  }
-
-  /* Remove the bottom border on the jumbotron for visual effect */
-  .jumbotron {
-    border-bottom: 0;
-  }
-}
+//@media screen and (min-width: 768px) {
+//  .container {
+//    max-width: 980px;
+//  }
+//
+//  /* Remove the padding we set earlier */
+//  .header,
+//  .marketing,
+//  .footer {
+//    padding-left: 0;
+//    padding-right: 0;
+//  }
+//
+//  /* Space out the masthead */
+//  .header {
+//    margin-bottom: 30px;
+//  }
+//
+//  /* Remove the bottom border on the jumbotron for visual effect */
+//  .jumbotron {
+//    border-bottom: 0;
+//  }
+//}
 
 body {
-    padding-top: 8px;
+    padding: 8px auto;
 }
 
 .header {
@@ -111,10 +112,17 @@ body {
     }
 }
 
+.footer {
+    text-align: center;
+    padding-top: 4px;
+    border-top: 1px dotted #DDD;
+}
+
 #progress {
     height: 3px;
     border-radius: 0;
     margin-bottom: 10px;
+    background: #EEE;
 }
 
 #progress-bar {
@@ -133,6 +141,7 @@ body {
     .chart {
         display: block;
         width: 100%;
+        text-align: center;
     }
 }
 
@@ -142,13 +151,21 @@ body {
 #bar-chart {
     height: 250px;
 }
+.chart-description {
+    background: #EEE;
+    border-radius: 3px;
+    padding: 2px 8px;
+    color: #555;
+}
 
 #mwb-options {
+    text-align: center;
+
     #mediaWikiUrl {
         width: 500px;
     }
     #pageName {
-        width: 385px;
+        width: 420px;
     }
 
     #minRandom,
@@ -157,8 +174,12 @@ body {
         width: 130px;
     }
 
+    #note {
+        width: 237px;
+    }
+
     #startBenchmark {
-        width: 385px;
+        width: 180px;
     }
 }
 
