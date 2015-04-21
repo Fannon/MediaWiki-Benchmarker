@@ -106,3 +106,22 @@ body {
     width: 100%;
     height: 240px;
 }
+
+#mwb-options {
+    #MediaWikiUrl {
+        width: 500px;
+    }
+    #PageName {
+        width: 385px;
+    }
+
+    #minRandom,
+    #maxRandom,
+    #iterations {
+        width: 130px;
+    }
+
+    #startBenchmark {
+        width: 385px;
+    }
+}
