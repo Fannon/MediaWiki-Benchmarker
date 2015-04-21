@@ -133,7 +133,7 @@ mwb.benchmarkPage = function(pageName, callback) {
 
                     mwb.dataObject.push({
                         benchmark: mwb.currentTitle,
-                        run: mwb.currentIteration,
+                        run: mwb.currentIteration + 1,
                         time: time
                     });
 
@@ -204,12 +204,27 @@ mwb.fetchPage = function(pageName, callback) {
 
 mwb.drawChart = function() {
 
-    console.log('Drawing Chart');
+    console.log('Drawing Charts');
 
     data = mwb.dataObject;
 
-    var visualization = d3plus.viz()
-        .container("#main-chart")
+    // Bar Chart
+    mwb.barChart = d3plus.viz()
+        .container("#bar-chart")
+        .data(data)
+        .type('bar')
+        .id('run')
+        .x({
+            value: 'benchmark',
+            label: false
+        })
+        .y('time')
+        .color('benchmark')
+        .draw();
+
+    // Box Plot Chart
+    mwb.boxPlotChart = d3plus.viz()
+        .container("#boxplot-chart")
         .data(data)
         .type('box')
         .id('run')
@@ -217,61 +232,18 @@ mwb.drawChart = function() {
             value: 'benchmark',
             label: false
         })
-        .y('time')
-        .size(4)
-        .ui([{
-            "label": "Visualization Type",
-            "method": "type",
-            "value": ["scatter","box", "line"]
-        }])
+        .y({
+            value: 'time',
+            label: 'TEST'
+        })
         .draw();
 
-
-
-
-
-    //var experiments = mwb.dataObject;
-    //
-    //var chart = dc.boxPlot("#box-plot-chart");
-    //var line = dc.boxPlot("#line-chart");
-    //mwb.chart = chart;
-    //
-    //experiments.forEach(function(x) {
-    //    x.Speed = +x.Speed;
-    //});
-    //
-    //var ndx                 = crossfilter(experiments),
-    //    runDimension        = ndx.dimension(function(d) {return +d.Run;}),
-    //    runGroup            = runDimension.group(),
-    //    experimentDimension = ndx.dimension(function(d) {return d.Expt;}),
-    //    speedSumGroup       = runDimension.group().reduceSum(function(d) {return d.Speed * d.Run / 1000;}),
-    //    speedArrayGroup     = experimentDimension.group().reduce(
-    //        function(p,v) {
-    //            p.push(v.Speed);
-    //            return p;
-    //        },
-    //        function(p,v) {
-    //            p.splice(p.indexOf(v.Speed), 1);
-    //            return p;
-    //        },
-    //        function() {
-    //            return [];
-    //        }
-    //    );
-    //
-    //chart
-    //    .width(920)
-    //    .height(480)
-    //    .margins({top: 10, right: 50, bottom: 30, left: 50})
-    //    .dimension(experimentDimension)
-    //    .group(speedArrayGroup)
-    //    .elasticY(true)
-    //    .elasticX(true);
-    //
-    //dc.renderAll();
-    //
-    //mwb.ndx = ndx;
-
+    // Data Table
+    $('#datatable').dynatable({
+        dataset: {
+            records: data
+        }
+    });
 };
 
 

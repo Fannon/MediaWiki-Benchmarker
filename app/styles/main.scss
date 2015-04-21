@@ -96,8 +96,13 @@ body {
   }
 }
 
-#main-chart {
+#boxplot-chart {
     display: block;
     width: 100%;
     height: 500px;
+}
+#bar-chart {
+    display: block;
+    width: 100%;
+    height: 240px;
 }

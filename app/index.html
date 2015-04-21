@@ -16,15 +16,9 @@
     <link rel="stylesheet" href="styles/main.css">
     <!-- endbuild -->
 
-    <!-- build:js scripts/vendor/modernizr.js -->
-    <script src="/bower_components/modernizr/modernizr.js"></script>
-    <!-- endbuild -->
 </head>
 <body>
-<!--[if lt IE 10]>
-<p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade
-    your browser</a> to improve your experience.</p>
-<![endif]-->
+
 
 <div class="container">
     <div class="header">
@@ -52,10 +46,11 @@
         </div>
     </div>
 
+    <div id="bar-chart"></div>
+    <div id="boxplot-chart"></div>
 
-    <div id="main-chart"></div>
+    <div id="data-table"></div>
 
-    <div id="line-chart" style="display: block;"></div>
 
     <div class="footer">
         <p>Simon Heimler 2015</p>
@@ -66,6 +61,7 @@
 <!-- bower:js -->
 <script src="/bower_components/jquery/dist/jquery.js"></script>
 <script src="/bower_components/simple-statistics/src/simple_statistics.js"></script>
+<script src="/bower_components/dynatable/jquery.dynatable.js"></script>
 <!-- endbower -->
 <!-- endbuild -->
 
