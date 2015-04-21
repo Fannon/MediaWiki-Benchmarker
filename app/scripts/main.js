@@ -83,6 +83,7 @@ mwb.resetIteration = function() {
 
     // Reset Interface
     $('#progress-bar').attr("aria-valuenow", 0).css('width', 0 + '%').text(0 + '%');
+    $('#progress').show();
 
 };
 
@@ -125,10 +126,7 @@ mwb.benchmarkPage = function(pageName, callback) {
                     });
 
                     if (!mwb.dataTable[mwb.currentIteration]) {
-                        mwb.dataTable[mwb.currentIteration] = {
-                            benchmark: mwb.currentTitle,
-                            run: mwb.currentIteration + 1
-                        };
+                        mwb.dataTable[mwb.currentIteration] = {};
                     }
 
                     mwb.dataTable[mwb.currentIteration][mwb.currentTitle] = time;
@@ -145,6 +143,7 @@ mwb.benchmarkPage = function(pageName, callback) {
                     if (mwb.currentIteration === mwb.totalIterations) {
                         console.log('Completed Benchmark on ' + mwb.currentTitle);
 
+                        $('#progress').hide();
                         mwb.drawChart();
                         mwb.drawData();
 
@@ -262,6 +261,28 @@ mwb.drawData = function() {
 
     // Analyze Data & draw the Table
     var html = '';
+
+
+    for (var i = 0; i < mwb.dataArray.length; i++) {
+        // Deep Copy of array
+        var column = JSON.parse(JSON.stringify(mwb.dataArray[i]));
+        var title = column.shift(); // Remove Column title
+
+        var analysis = {
+            avg: ss.average(column),
+            min: ss.min(column),
+            max: ss.max(column),
+            standard_deviation: Math.round(ss.standard_deviation(column) * 100) / 100
+        };
+
+        mwb.analysisObject[title] = analysis;
+
+        html += '<tr><td>' + title + '</td><td>' + analysis.avg + '</td><td>' + analysis.min + '</td><td>';
+        html += analysis.max + '</td><td>' + analysis.standard_deviation + '</td></tr>';
+
+    }
+
+    console.log(mwb.analysisObject);
 
     //$.each(mwb.dataObject.data, function (key, value) {
     //
