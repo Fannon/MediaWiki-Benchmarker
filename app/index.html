@@ -1,0 +1,93 @@
+<!doctype html>
+<html class="no-js" lang="">
+<head>
+    <meta charset="utf-8">
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>MediaWiki Benchmarker</title>
+    <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+
+    <!-- build:css styles/vendor.css -->
+    <!-- bower:css -->
+    <!-- endbower -->
+    <!-- endbuild -->
+
+    <!-- build:css styles/main.css -->
+    <link rel="stylesheet" href="styles/main.css">
+    <!-- endbuild -->
+
+    <!-- build:js scripts/vendor/modernizr.js -->
+    <script src="/bower_components/modernizr/modernizr.js"></script>
+    <!-- endbuild -->
+</head>
+<body>
+<!--[if lt IE 10]>
+<p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade
+    your browser</a> to improve your experience.</p>
+<![endif]-->
+
+<div class="container">
+    <div class="header">
+        <ul class="nav nav-pills pull-right">
+            <li class="active"><a href="#">Home</a></li>
+            <li><a href="http://www.fannon.de" target="_blank">About</a></li>
+        </ul>
+        <h3 class="text-muted">MediaWiki Benchmarker</h3>
+    </div>
+
+    <form class="form-inline">
+        <div class="form-group ">
+            <input type="url" class="form-control col-sm-9" id="webAdress" placeholder="Enter URL">
+        </div>
+
+        <button type="submit" class="btn btn-default">Benchmark</button>
+    </form>
+
+    <br>
+
+    <div id="progress" class="progress" style="display: block;">
+        <div id="progress-bar" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0"
+             aria-valuemax="100" style="width: 0%;">
+
+        </div>
+    </div>
+
+
+    <div id="main-chart"></div>
+
+    <div id="line-chart" style="display: block;"></div>
+
+    <div class="footer">
+        <p>Simon Heimler 2015</p>
+    </div>
+</div>
+
+<!-- build:js scripts/vendor.js -->
+<!-- bower:js -->
+<script src="/bower_components/jquery/dist/jquery.js"></script>
+<script src="/bower_components/simple-statistics/src/simple_statistics.js"></script>
+<!-- endbower -->
+<!-- endbuild -->
+
+<!-- build:js scripts/plugins.js -->
+<!-- <script src="/bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/affix.js"></script> -->
+<!-- <script src="/bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/alert.js"></script> -->
+<!-- <script src="/bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/dropdown.js"></script> -->
+<script src="/bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/tooltip.js"></script>
+<script src="/bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/modal.js"></script>
+<!-- <script src="/bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/transition.js"></script> -->
+<script src="/bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/button.js"></script>
+<!-- <script src="/bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/popover.js"></script> -->
+<!-- <script src="/bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/carousel.js"></script> -->
+<!-- <script src="/bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/scrollspy.js"></script> -->
+<!-- <script src="/bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/collapse.js"></script> -->
+<script src="/bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/tab.js"></script>
+<!-- endbuild -->
+
+<!-- build:js scripts/main.js -->
+<script src="scripts/d3.js"></script>
+<script src="scripts/d3plus.js"></script>
+<script src="scripts/main.js"></script>
+<!-- endbuild -->
+</body>
+</html>
