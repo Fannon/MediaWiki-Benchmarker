@@ -19,7 +19,9 @@ var mwb = {}; // Global Namespace
  * Default Options
  * @type {Object}
  */
-mwb.options = {};
+mwb.options = {
+    previewModulo: 3
+};
 
 
 //////////////////////////////
@@ -97,7 +99,7 @@ mwb.resetIteration = function() {
     mwb.totalIterations = 0;
 
     // Reset Interface
-    $('#progress-bar').attr('aria-valuenow', 0).css('width', 0 + '%').text(0 + '%');
+    $('#progress-bar').attr('aria-valuenow', 0).css('width', 0 + '%').text('');
 
 };
 
@@ -119,9 +121,9 @@ mwb.benchmarkPage = function(pageName) {
 
     console.log('Benchmarking: ' + pageName);
 
-    $('#progress').show();
     mwb.resetIteration();
 
+    mwb.startTime = new Date().getTime();
     mwb.analysisObject.benchmarkStartUnix = Math.floor(new Date().getTime() / 1000);
     mwb.analysisObject.benchmarkStartFormatted = mwb.getFormattedTime();
 
@@ -216,14 +218,20 @@ mwb.onPageFetch = function(err, data, time) {
         $('#progress-bar')
             .attr('aria-valuenow', percent)
             .css('width', percent + '%')
-            .text(percent + '%');
+            .text(percent + '% (' + time + 'ms)');
+
+        // Preview every n-th iteration
 
         if (mwb.currentIteration === mwb.totalIterations) {
-            console.log('Completed Benchmark on ' + mwb.currentTitle);
+            var totalTime = (new Date().getTime()) - mwb.startTime;
 
-            $('#progress').hide();
             mwb.drawChart();
             mwb.drawData();
+
+            console.log('Completed Benchmark in ' + totalTime + 'ms on ' + mwb.currentTitle);
+
+        } else if (mwb.currentIteration % mwb.options.previewModulo === 0) {
+            mwb.drawChart();
         }
     }
 };
@@ -299,6 +307,7 @@ mwb.drawChart = function() {
     'use strict';
 
     console.log('Drawing Charts');
+
     $('#bar-chart').html('');
     $('#boxplot-chart').html('');
 

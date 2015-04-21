@@ -25,6 +25,11 @@
         <h3 class="text-muted">MediaWiki Benchmarker</h3>
     </div>
 
+    <div id="progress" class="progress">
+        <div id="progress-bar" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0">
+        </div>
+    </div>
+
     <form id="mwb-options" class="form-inline">
         <p>
 
@@ -40,11 +45,11 @@
         <p>
 
             <div class="form-group ">
-                <input type="number" class="form-control" id="iterations" placeholder="Iterations" value="7" required
+                <input type="number" class="form-control" id="iterations" placeholder="Iterations" value="20" required
                        data-toggle="tooltip" data-placement="top" title="Number of Iterations">
-                <input type="number" class="form-control" id="minRandom" placeholder="MinRandom" value="300" required
+                <input type="number" class="form-control" id="minRandom" placeholder="MinRandom" value="400" required
                        data-toggle="tooltip" data-placement="top" title="Minimum random time inverval (time between requests)">
-                <input type="number" class="form-control" id="maxRandom" placeholder="MaxRandom" value="600" required
+                <input type="number" class="form-control" id="maxRandom" placeholder="MaxRandom" value="800" required
                        data-toggle="tooltip" data-placement="top" title="Maximum random time inverval (time between requests)">
                 <button class="btn btn-default btn-danger" id="reset"
                         data-toggle="tooltip" data-placement="top" title="Reset all benchmarked data">
@@ -58,10 +63,7 @@
         </p>
     </form>
 
-    <div id="progress" class="progress" style="display: none;">
-        <div id="progress-bar" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0">
-        </div>
-    </div>
+
 
     <div id="messages"></div>
 

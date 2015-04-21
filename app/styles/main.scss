@@ -111,6 +111,18 @@ body {
     }
 }
 
+#progress {
+    height: 3px;
+    border-radius: 0;
+    margin-bottom: 10px;
+}
+
+#progress-bar {
+    height: 3px;
+    border-radius: 0;
+    transition: none;
+}
+
 .chartWrapper {
     width: 100%;
     border: 1px solid #DDD;
