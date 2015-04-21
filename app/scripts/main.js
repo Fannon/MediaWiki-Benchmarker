@@ -1,5 +1,5 @@
-/*jshint jquery: true, devel: true */
-/*global dc, d3, crossfilter, colorbrewer, ss */
+/*jshint jquery: true, devel: true, loopfunc: true */
+/*global d3plus */
 
 ///////////////////////////////////////////////////
 // MediaWiki Benchmark Script                    //
@@ -60,7 +60,7 @@ $(function() {
  * Resets the state of the tool
  */
 mwb.resetAll = function() {
-    "use strict";
+    'use strict';
 
     mwb.resetIteration();
 
@@ -85,6 +85,7 @@ mwb.resetAll = function() {
 };
 
 mwb.resetIteration = function() {
+    'use strict';
 
     mwb.warningSent = false;
 
@@ -96,12 +97,13 @@ mwb.resetIteration = function() {
     mwb.totalIterations = 0;
 
     // Reset Interface
-    $('#progress-bar').attr("aria-valuenow", 0).css('width', 0 + '%').text(0 + '%');
+    $('#progress-bar').attr('aria-valuenow', 0).css('width', 0 + '%').text(0 + '%');
 
 };
 
 
 mwb.getOptions = function() {
+    'use strict';
 
     // Get current Form Values
     mwb.options.mediaWikiUrl = $('#mediaWikiUrl').val();
@@ -112,10 +114,8 @@ mwb.getOptions = function() {
     mwb.options.maxRandom = parseInt($('#maxRandom').val(), 10);
 };
 
-
-
-
-mwb.benchmarkPage = function(pageName, callback) {
+mwb.benchmarkPage = function(pageName) {
+    'use strict';
 
     console.log('Benchmarking: ' + pageName);
 
@@ -139,42 +139,7 @@ mwb.benchmarkPage = function(pageName, callback) {
 
         setTimeout(function() {
 
-            mwb.fetchPage(pageName, function(err, data, time) {
-
-                if (!err) {
-
-                    console.log('Iteration ' + mwb.currentIteration + ' in ' + time + 'ms');
-
-                    mwb.dataArray[mwb.benchmark - 1].push(time);
-
-                    mwb.dataObject.push({
-                        benchmark: mwb.currentTitle,
-                        run: mwb.currentIteration + 1,
-                        time: time
-                    });
-
-                    // mwb.progress Bar
-                    mwb.currentIteration += 1;
-                    var percent = Math.round(mwb.currentIteration / mwb.totalIterations * 100);
-                    $('#progress-bar')
-                        .attr("aria-valuenow", percent)
-                        .css('width', percent + '%')
-                        .text(percent + '%');
-
-                    if (mwb.currentIteration === mwb.totalIterations) {
-                        console.log('Completed Benchmark on ' + mwb.currentTitle);
-
-                        $('#progress').hide();
-                        mwb.drawChart();
-                        mwb.drawData();
-
-                        if (callback) {
-                            return callback(false); // No Error
-                        }
-
-                    }
-                }
-            });
+            mwb.fetchPage(pageName, mwb.onPageFetch);
 
         }, mwb.timer);
 
@@ -188,37 +153,80 @@ mwb.benchmarkPage = function(pageName, callback) {
 
 
 mwb.fetchPage = function(pageName, callback) {
+    'use strict';
 
     var now = (new Date()).getTime();
 
-    $.getJSON(mwb.options.mediaWikiUrl + '?callback=?', {
+    var request = $.getJSON(mwb.options.mediaWikiUrl + '?callback=?', {
         action: 'parse',
         page: pageName,
         format: 'json'
-    }, function(data) {
+    });
 
+    request.done(function(data) {
         var time = (new Date().getTime()) - now;
 
+        // If the request succeeds but the MediaWiki API returns an error:
         if (data.error) {
-            mwb.log('<strong>API ERROR:</strong> "' + data.error.code + '" - ' + data.error.info + ' (See Console)');
+            mwb.log('<strong>MediaWiki API:</strong> "' + data.error.code + '" - ' + data.error.info + ' (See Console)');
             console.error(data);
             return callback(data.error, false, time);
         }
 
-        //if (time > mwb.options.minRandom && !mwb.warningSent) {
-        //    var msg = 'Warning: The MediaWiki Installation could be responding slower than the Browser is requesting the pages!<br>';
-        //    msg += 'This can lead to added up benchmark results which are caused by the connection Limit of the Browser. <a href="img/ConnectionQueueWarning.png" target="_blank">Example</a>)<br>';
-        //    msg += 'To avoid this increase the Minimum Random Intervall so that it is higher than the expected Response time.';
-        //    mwb.log(msg);
-        //    mwb.warningSent = true;
-        //}
-
         return callback(false, data, time);
+    });
 
+    // API request failed:
+    request.fail(function(e) {
+        var time = (new Date().getTime()) - now;
+        console.error(e);
+        mwb.log('<strong>AJAX Request:</strong> Status "' + e.status + '" - ' + e.statusText + ' (See Console)');
+        return callback(e, false, time);
     });
 
 };
 
+
+/**
+ * Callback Function on Page Fetched
+ *
+ * @param err
+ * @param data
+ * @param time
+ * @returns {*|{accepted, value}}
+ */
+mwb.onPageFetch = function(err, data, time) {
+    'use strict';
+
+    if (!err) {
+
+        console.log('Iteration ' + mwb.currentIteration + ' in ' + time + 'ms');
+
+        mwb.dataArray[mwb.benchmark - 1].push(time);
+
+        mwb.dataObject.push({
+            benchmark: mwb.currentTitle,
+            run: mwb.currentIteration + 1,
+            time: time
+        });
+
+        // mwb.progress Bar
+        mwb.currentIteration += 1;
+        var percent = Math.round(mwb.currentIteration / mwb.totalIterations * 100);
+        $('#progress-bar')
+            .attr('aria-valuenow', percent)
+            .css('width', percent + '%')
+            .text(percent + '%');
+
+        if (mwb.currentIteration === mwb.totalIterations) {
+            console.log('Completed Benchmark on ' + mwb.currentTitle);
+
+            $('#progress').hide();
+            mwb.drawChart();
+            mwb.drawData();
+        }
+    }
+};
 
 
 /**
@@ -229,7 +237,7 @@ mwb.fetchPage = function(pageName, callback) {
  * @param  {Number} currentInterval
  */
 mwb.purgePage = function(page, currentCounter, currentInterval) {
-    "use strict";
+    'use strict';
 
     setTimeout(function() {
 
@@ -263,6 +271,24 @@ mwb.purgePage = function(page, currentCounter, currentInterval) {
 };
 
 
+/**
+ * Write a Message to the Message Div
+ * @param msg
+ */
+mwb.log = function(msg) {
+    'use strict';
+
+    var currentdate = new Date();
+    var time = mwb.pad(currentdate.getHours()) + ':' + mwb.pad(currentdate.getMinutes()) + ':' + mwb.pad(currentdate.getSeconds());
+
+    var html = '<div class="alert alert-warning alert-dismissible" role="alert">';
+    html += '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
+    html += '[' + time + '] ' + msg + '</div>';
+
+    $('#messages').append(html);
+    $('.alert').alert();
+};
+
 
 
 //////////////////////////////////////////
@@ -270,16 +296,17 @@ mwb.purgePage = function(page, currentCounter, currentInterval) {
 //////////////////////////////////////////
 
 mwb.drawChart = function() {
+    'use strict';
 
     console.log('Drawing Charts');
     $('#bar-chart').html('');
     $('#boxplot-chart').html('');
 
-    data = mwb.dataObject;
+    var data = mwb.dataObject;
 
     // Bar Chart
     mwb.barChart = d3plus.viz()
-        .container("#bar-chart")
+        .container('#bar-chart')
         .data(data)
         .type('bar')
         .id('run')
@@ -297,7 +324,7 @@ mwb.drawChart = function() {
 
     // Box Plot Chart
     mwb.boxPlotChart = d3plus.viz()
-        .container("#boxplot-chart")
+        .container('#boxplot-chart')
         .data(data)
         .type('box')
         .id('run')
@@ -321,11 +348,9 @@ mwb.drawChart = function() {
 /**
  * Analyzes the Data and generates a summary table
  * Puts the raw Data to download formats
- *
- * Uses http://macwright.org/simple-statistics/ for Statistical Analysis
  */
 mwb.drawData = function() {
-    "use strict";
+    'use strict';
 
     console.log('Analyzing Data');
 
@@ -338,17 +363,20 @@ mwb.drawData = function() {
         var column = JSON.parse(JSON.stringify(mwb.dataArray[i]));
         var title = column.shift(); // Remove Column title
 
+        var sum = column.reduce(function(a, b) { return a + b; });
+
         var analysis = {
-            avg: Math.round(ss.average(column) * 100) / 100,
-            min: ss.min(column),
-            max: ss.max(column),
-            standard_deviation: Math.round(ss.standard_deviation(column) * 100) / 100
+            avg: Math.round(sum / column.length * 100) / 100,
+            min: Math.min.apply(Math, column),
+            max:  Math.max.apply(Math, column)
         };
 
         mwb.analysisObject[title] = analysis;
 
-        html += '<tr><td>' + title + '</td><td>' + analysis.avg + '</td><td>' + analysis.min + '</td><td>';
-        html += analysis.max + '</td><td>' + analysis.standard_deviation + '</td></tr>';
+        html += '<tr><td>' + title + '</td>';
+        html += '<td>' + analysis.avg + '</td>';
+        html += '<td>' + analysis.min + '</td>';
+        html += '<td>' + analysis.max + '</td></tr>';
 
     }
 
@@ -356,7 +384,7 @@ mwb.drawData = function() {
 
     // JSON Export: mwb.dataArray
     var jsonExport = $('#jsonExport');
-    jsonExport.removeAttr("disabled");
+    jsonExport.removeAttr('disabled');
     var json = {
         array: mwb.dataArray,
         object: mwb.dataObject,
@@ -364,29 +392,29 @@ mwb.drawData = function() {
         options: mwb.options
     };
     jsonExport.attr('href', ('data:text/json;base64,' + btoa(JSON.stringify(json, false, 4))));
-    jsonExport.attr("download", mwb.getFormattedTime() + ".json");
+    jsonExport.attr('download', mwb.getFormattedTime() + '.json');
 
     // CSV Export
     var csvExport = $('#csvExport');
-    csvExport.attr("href", 'data:text/csv;base64,' + btoa(mwb.convertToCSV(mwb.dataArray)));
-    csvExport.attr("download", mwb.getFormattedTime() + ".csv");
-    csvExport.removeAttr("disabled");
+    csvExport.attr('href', 'data:text/csv;base64,' + btoa(mwb.convertToCSV(mwb.dataArray)));
+    csvExport.attr('download', mwb.getFormattedTime() + '.csv');
+    csvExport.removeAttr('disabled');
 
     // SVG Export
     var svgExportBarChart = $('#svgExportBarChart');
     setTimeout(function() {
-        svgExportBarChart.attr("href", 'data:text/svg;base64,' + btoa($('#bar-chart svg').prop('outerHTML')));
-        svgExportBarChart.attr("download", mwb.getFormattedTime() + "_BarChart.svg");
-        svgExportBarChart.removeAttr("disabled");
+        svgExportBarChart.attr('href', 'data:text/svg;base64,' + btoa($('#bar-chart svg').prop('outerHTML')));
+        svgExportBarChart.attr('download', mwb.getFormattedTime() + '_BarChart.svg');
+        svgExportBarChart.removeAttr('disabled');
     }, 200);
 
 
     // SVG Export
     var svgExportBoxPlot = $('#svgExportBoxPlotChart');
     setTimeout(function() {
-        svgExportBoxPlot.attr("href", 'data:text/svg;base64,' + btoa($('#boxplot-chart svg').prop('outerHTML')));
-        svgExportBoxPlot.attr("download", mwb.getFormattedTime() + "_BoxPlot.svg");
-        svgExportBoxPlot.removeAttr("disabled");
+        svgExportBoxPlot.attr('href', 'data:text/svg;base64,' + btoa($('#boxplot-chart svg').prop('outerHTML')));
+        svgExportBoxPlot.attr('download', mwb.getFormattedTime() + '_BoxPlot.svg');
+        svgExportBarChart.removeAttr('disabled');
     }, 200);
 
 };
@@ -404,7 +432,7 @@ mwb.drawData = function() {
  * @return {String}          CSV String
  */
 mwb.convertToCSV = function(dataArray) {
-    "use strict";
+    'use strict';
 
     var array = typeof dataArray !== 'object' ? JSON.parse(dataArray) : dataArray;
     var str = '';
@@ -421,12 +449,11 @@ mwb.convertToCSV = function(dataArray) {
                 line += array[i][index];
             }
         }
-
         str += line + '\r\n';
     }
-
     return str;
 };
+
 
 /**
  * Pads a Number
@@ -434,34 +461,17 @@ mwb.convertToCSV = function(dataArray) {
  * @returns {string}    Padded Number
  */
 mwb.pad = function(n) {
-    "use strict";
+    'use strict';
     return n < 10 ? '0' + n : n;
 };
 
-/**
- * Write a Message to the Message Div
- * @param msg
- */
-mwb.log = function(msg) {
-    "use strict";
-
-    var currentdate = new Date();
-    var time = mwb.pad(currentdate.getHours()) + ":" + mwb.pad(currentdate.getMinutes()) + ":" + mwb.pad(currentdate.getSeconds());
-
-    var html = '<div class="alert alert-warning alert-dismissible" role="alert">';
-    html += '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
-    html += '[' + time + '] ' + msg + '</div>';
-
-    $('#messages').append(html);
-    $(".alert").alert();
-};
 
 /**
  * Returns a DateString
  * @return {String}           [description]
  */
 mwb.getFormattedTime = function() {
-    "use strict";
+    'use strict';
 
     var a = new Date();
 

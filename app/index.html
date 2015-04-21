@@ -30,9 +30,9 @@
 
             <div class="form-group ">
                 <input type="url" class="form-control" id="mediaWikiUrl" placeholder="MediaWiki URL"
-                       value="http://de.wikipedia.org/w/api.php" required
+                       value="http://en.wikipedia.org/w/api.php" required
                        data-toggle="tooltip" data-placement="top" title="URL to the MediaWiki API (http://de.wikipedia.org/w/api.php)">
-                <input type="text" class="form-control" id="pageName" placeholder="PageName" value="MediaWiki" required
+                <input type="text" class="form-control" id="pageName" placeholder="PageName" value="Main Page" required
                        data-toggle="tooltip" data-placement="top" title="Wiki page name">
             </div>
         </p>
@@ -82,7 +82,6 @@
                 <th>Average load time</th>
                 <th>Minimum load time</th>
                 <th>Maximum load time</th>
-                <th>Standard deviation</th>
             </tr>
             </thead>
             <tbody id="data-tbody">
@@ -106,11 +105,12 @@
 
 <!-- build:js scripts/vendor.js -->
 <!-- bower:js -->
+<script src="/bower_components/modernizr/modernizr.js"></script>
 <script src="/bower_components/jquery/dist/jquery.js"></script>
-<script src="/bower_components/simple-statistics/src/simple_statistics.js"></script>
+<!-- endbower -->
 <script src="/bower_components/d3plus/js/d3.js"></script>
 <script src="/bower_components/d3plus/js/d3plus.js"></script>
-<!-- endbower -->
+
 <!-- endbuild -->
 
 <!-- build:js scripts/plugins.js -->
