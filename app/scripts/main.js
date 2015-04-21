@@ -114,13 +114,23 @@ mwb.getOptions = function() {
     'use strict';
 
     // Get current Form Values
-    mwb.options.mediaWikiUrl = $('#mediaWikiUrl').val();
-    mwb.options.pageName = $('#pageName').val();
-    mwb.options.note = $('#note').val();
+    mwb.options.mediaWikiUrl = $('#mediaWikiUrl').val().trim();
+    mwb.options.pageName = $('#pageName').val().trim();
+    mwb.options.jobQueue = [];
+    mwb.options.note = $('#note').val().trim();
 
-    mwb.options.iterations = parseInt($('#iterations').val(), 10);
-    mwb.options.minRandom = parseInt($('#minRandom').val(), 10);
-    mwb.options.maxRandom = parseInt($('#maxRandom').val(), 10);
+    mwb.options.iterations = parseInt($('#iterations').val().trim(), 10);
+    mwb.options.minRandom = parseInt($('#minRandom').val().trim(), 10);
+    mwb.options.maxRandom = parseInt($('#maxRandom').val().trim(), 10);
+
+    // If more than one pageName is given (separated by ;), create a job queue
+    if (mwb.options.pageName.indexOf(';') > -1) {
+        mwb.options.jobQueue = mwb.options.pageName.split(';');
+
+        // Move the first item of the queue to be the first page
+        mwb.options.pageName = mwb.options.jobQueue.shift();
+        mwb.options.pageName = mwb.options.pageName.trim();
+    }
 };
 
 /**
@@ -255,10 +265,18 @@ mwb.onPageFetch = function(err, data, time) {
 
             console.log('Completed Benchmark in ' + totalTime + 'ms on ' + mwb.currentTitle);
 
+            if (mwb.options.jobQueue[0]) {
+                console.log('Job Queue detected! ' + mwb.options.jobQueue.length + ' to go!');
+
+                // Move the first item of the queue to be the first page
+                mwb.options.pageName = mwb.options.jobQueue.shift();
+                mwb.options.pageName = mwb.options.pageName.trim();
+
+                mwb.benchmarkPage(mwb.options.pageName);
+            }
+
         // Preview every n-th iteration
         } else if (mwb.currentIteration % mwb.options.previewModulo === 0) {
-
-
             mwb.drawChart();
         }
     }
