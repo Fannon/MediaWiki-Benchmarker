@@ -37,6 +37,7 @@ $(function() {
     // Reset / Init Interface
     mwb.resetAll();
 
+    // Register Button Events
     $('#reset').on('click', function(e) {
         e.preventDefault();
         mwb.resetAll();
@@ -50,7 +51,6 @@ $(function() {
         return false;
     });
 
-
 });
 
 
@@ -59,7 +59,7 @@ $(function() {
 //////////////////////////////////////////
 
 /**
- * Resets the state of the tool
+ * Resets the complete state of the application
  */
 mwb.resetAll = function() {
     'use strict';
@@ -86,6 +86,9 @@ mwb.resetAll = function() {
 
 };
 
+/**
+ * Resets the state between benchmarks
+ */
 mwb.resetIteration = function() {
     'use strict';
 
@@ -103,7 +106,9 @@ mwb.resetIteration = function() {
 
 };
 
-
+/**
+ * Read options from the UI / forms
+ */
 mwb.getOptions = function() {
     'use strict';
 
@@ -116,6 +121,11 @@ mwb.getOptions = function() {
     mwb.options.maxRandom = parseInt($('#maxRandom').val(), 10);
 };
 
+/**
+ * Repeatedly benchmarks a wiki page, using the given number of iterations
+ *
+ * @param pageName
+ */
 mwb.benchmarkPage = function(pageName) {
     'use strict';
 
@@ -149,11 +159,15 @@ mwb.benchmarkPage = function(pageName) {
 
     }
 
-    return true;
-
 };
 
-
+/**
+ * Fetches a page from the wiki through AJAY and measures the time needed
+ * Handles errors that may occur
+ *
+ * @param pageName
+ * @param callback
+ */
 mwb.fetchPage = function(pageName, callback) {
     'use strict';
 
@@ -190,7 +204,8 @@ mwb.fetchPage = function(pageName, callback) {
 
 
 /**
- * Callback Function on Page Fetched
+ * Callback Function on Page fetched
+ * Writes the measured time to the data and triggers the chart / data output if done
  *
  * @param err
  * @param data
@@ -220,8 +235,8 @@ mwb.onPageFetch = function(err, data, time) {
             .css('width', percent + '%')
             .text(percent + '% (' + time + 'ms)');
 
-        // Preview every n-th iteration
 
+        // If all iterations have run, complete the benchmark run
         if (mwb.currentIteration === mwb.totalIterations) {
             var totalTime = (new Date().getTime()) - mwb.startTime;
 
@@ -230,7 +245,10 @@ mwb.onPageFetch = function(err, data, time) {
 
             console.log('Completed Benchmark in ' + totalTime + 'ms on ' + mwb.currentTitle);
 
+        // Preview every n-th iteration
         } else if (mwb.currentIteration % mwb.options.previewModulo === 0) {
+
+
             mwb.drawChart();
         }
     }
@@ -278,24 +296,6 @@ mwb.purgePage = function(page, currentCounter, currentInterval) {
 
 };
 
-
-/**
- * Write a Message to the Message Div
- * @param msg
- */
-mwb.log = function(msg) {
-    'use strict';
-
-    var currentdate = new Date();
-    var time = mwb.pad(currentdate.getHours()) + ':' + mwb.pad(currentdate.getMinutes()) + ':' + mwb.pad(currentdate.getSeconds());
-
-    var html = '<div class="alert alert-warning alert-dismissible" role="alert">';
-    html += '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
-    html += '[' + time + '] ' + msg + '</div>';
-
-    $('#messages').append(html);
-    $('.alert').alert();
-};
 
 
 
@@ -409,7 +409,7 @@ mwb.drawData = function() {
     csvExport.attr('download', mwb.getFormattedTime() + '.csv');
     csvExport.removeAttr('disabled');
 
-    // SVG Export
+    // Bar Chart SVG Export
     var svgExportBarChart = $('#svgExportBarChart');
     setTimeout(function() {
         svgExportBarChart.attr('href', 'data:text/svg;base64,' + btoa($('#bar-chart svg').prop('outerHTML')));
@@ -417,8 +417,7 @@ mwb.drawData = function() {
         svgExportBarChart.removeAttr('disabled');
     }, 200);
 
-
-    // SVG Export
+    // Box Plot SVG Export
     var svgExportBoxPlot = $('#svgExportBoxPlotChart');
     setTimeout(function() {
         svgExportBoxPlot.attr('href', 'data:text/svg;base64,' + btoa($('#boxplot-chart svg').prop('outerHTML')));
@@ -432,11 +431,32 @@ mwb.drawData = function() {
 // Helper Functions         //
 //////////////////////////////
 
+
 /**
- *  Converts an Array to a (Excel compatible) CSV String
+ * Outputs a (warning) message to the UI
  *
- * Adapted from:
- * http://stackoverflow.com/questions/11257062/converting-json-object-to-csv-format-in-javascript
+ * @param msg
+ */
+mwb.log = function(msg) {
+    'use strict';
+
+    var currentdate = new Date();
+    var time = mwb.pad(currentdate.getHours()) + ':' + mwb.pad(currentdate.getMinutes()) + ':' + mwb.pad(currentdate.getSeconds());
+
+    var html = '<div class="alert alert-warning alert-dismissible" role="alert">';
+    html += '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
+    html += '[' + time + '] ' + msg + '</div>';
+
+    $('#messages').append(html);
+    $('.alert').alert();
+};
+
+
+/**
+ * Converts an Array to a (Excel compatible) CSV String
+ *
+ * @see http://stackoverflow.com/questions/11257062/converting-json-object-to-csv-format-in-javascript
+ *
  * @param  {Array}  dataArray Input Array
  * @return {String}          CSV String
  */
@@ -466,6 +486,7 @@ mwb.convertToCSV = function(dataArray) {
 
 /**
  * Pads a Number
+ *
  * @param n             Number to Pad
  * @returns {string}    Padded Number
  */
@@ -476,7 +497,8 @@ mwb.pad = function(n) {
 
 
 /**
- * Returns a DateString
+ * Returns a formatted DateString: YYYY-MM-DD_-_HH:MM_SS
+ *
  * @return {String}           [description]
  */
 mwb.getFormattedTime = function() {

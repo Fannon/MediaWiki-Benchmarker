@@ -2,7 +2,8 @@
 <html class="no-js" lang="">
 <head>
     <meta charset="utf-8">
-    <meta name="description" content="">
+    <meta name="description" content="A web-based MediaWiki Benchmarker">
+    <meta name="author" content="Simon Heimler">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>MediaWiki Benchmarker</title>
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
@@ -22,7 +23,7 @@
 
 <div class="container">
     <div class="header">
-        <h3 class="text-muted">MediaWiki Benchmarker</h3>
+        <h3 class="text-muted">MediaWiki Benchmarker <small id="lastBenchmark"></small></h3>
     </div>
 
     <div id="progress" class="progress">
@@ -75,6 +76,9 @@
         <div id="boxplot-chart" class="chart"></div>
     </div>
 
+    <div class="chartWrapper">
+        <div id="scatterplot-chart" class="chart"></div>
+    </div>
 
     <div id="data_div" class="chartWrapper">
         <table id="summary-table" class="table table-condensed">
