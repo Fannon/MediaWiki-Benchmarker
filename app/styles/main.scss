@@ -124,9 +124,6 @@ body {
     }
 }
 
-
-
-
 #boxplot-chart {
     height: 500px;
 }
@@ -150,5 +147,15 @@ body {
 
     #startBenchmark {
         width: 385px;
+    }
+}
+
+.alert {
+    padding: 4px 10px;
+    margin-bottom: 10px;
+
+    .close {
+        top: -1px !important;
+        right: -2px !important;
     }
 }

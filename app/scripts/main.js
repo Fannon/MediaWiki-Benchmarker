@@ -77,6 +77,7 @@ mwb.resetAll = function() {
     mwb.getOptions();
 
     // Reset Interface
+    $('#messages').html('');
     $('#bar-chart').html('');
     $('#boxplot-chart').html('');
     $('#data-tbody').html('');
@@ -129,7 +130,7 @@ mwb.benchmarkPage = function(pageName, callback) {
     mwb.benchmark += 1;
 
     // Set Benchmark Run title
-    mwb.currentTitle = pageName + '-' + mwb.benchmark;
+    mwb.currentTitle = '#' + mwb.benchmark + ' ' + pageName;
     mwb.benchmarks.push(mwb.currentTitle);
     // Add the title as the first row item
     mwb.dataArray[mwb.benchmark - 1] = [mwb.currentTitle];
@@ -199,19 +200,18 @@ mwb.fetchPage = function(pageName, callback) {
         var time = (new Date().getTime()) - now;
 
         if (data.error) {
-            mwb.log('API ERROR: "' + data.error.code + '" - ' + data.error.info);
-            console.error(data.error);
-            console.dir(data);
+            mwb.log('<strong>API ERROR:</strong> "' + data.error.code + '" - ' + data.error.info + ' (See Console)');
+            console.error(data);
             return callback(data.error, false, time);
         }
 
-        if (time > mwb.options.minRandom && !mwb.warningSent) {
-            var msg = 'Warning: The MediaWiki Installation could be responding slower than the Browser is requesting the pages!<br>';
-            msg += 'This can lead to added up benchmark results which are caused by the connection Limit of the Browser. <a href="img/ConnectionQueueWarning.png" target="_blank">Example</a>)<br>';
-            msg += 'To avoid this increase the Minimum Random Intervall so that it is higher than the expected Response time.';
-            mwb.log(msg);
-            mwb.warningSent = true;
-        }
+        //if (time > mwb.options.minRandom && !mwb.warningSent) {
+        //    var msg = 'Warning: The MediaWiki Installation could be responding slower than the Browser is requesting the pages!<br>';
+        //    msg += 'This can lead to added up benchmark results which are caused by the connection Limit of the Browser. <a href="img/ConnectionQueueWarning.png" target="_blank">Example</a>)<br>';
+        //    msg += 'To avoid this increase the Minimum Random Intervall so that it is higher than the expected Response time.';
+        //    mwb.log(msg);
+        //    mwb.warningSent = true;
+        //}
 
         return callback(false, data, time);
 
@@ -447,8 +447,13 @@ mwb.log = function(msg) {
 
     var currentdate = new Date();
     var time = mwb.pad(currentdate.getHours()) + ":" + mwb.pad(currentdate.getMinutes()) + ":" + mwb.pad(currentdate.getSeconds());
-    $('#msg').append('<div class="alert alert-warning"><a class="close" data-dismiss="alert" href="#" aria-hidden="true">&times;</a>[' + time + '] ' + msg + '</div>');
-    //$(".alert").alert();
+
+    var html = '<div class="alert alert-warning alert-dismissible" role="alert">';
+    html += '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
+    html += '[' + time + '] ' + msg + '</div>';
+
+    $('#messages').append(html);
+    $(".alert").alert();
 };
 
 /**
