@@ -423,7 +423,7 @@ mwb.drawData = function() {
     setTimeout(function() {
         svgExportBoxPlot.attr('href', 'data:text/svg;base64,' + btoa($('#boxplot-chart svg').prop('outerHTML')));
         svgExportBoxPlot.attr('download', mwb.getFormattedTime() + '_BoxPlot.svg');
-        svgExportBarChart.removeAttr('disabled');
+        svgExportBoxPlot.removeAttr('disabled');
     }, 200);
 
 };
