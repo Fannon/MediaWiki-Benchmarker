@@ -53,8 +53,6 @@ $(function() {
 mwb.resetAll = function() {
     "use strict";
 
-    console.log('Reset All');
-
     mwb.resetIteration();
 
     /** Benchmarks */
@@ -63,16 +61,9 @@ mwb.resetAll = function() {
 
     /** Data */
     mwb.dataArray = []; // 2-dim array
-    mwb.dataObject = [];
+    mwb.dataObject = []; // For d3plus
+    mwb.dataTable = [];  // For dynatable
     mwb.analysisObject = {};
-
-    /** Return Object for JSON Export */
-    mwb.returnObject = {
-        array: mwb.dataArray,
-        object: mwb.dataObject,
-        analysis: mwb.analysisObject,
-        options: mwb.options
-    };
 
     // Reset Interface
     $('#chart').html('');
@@ -80,8 +71,6 @@ mwb.resetAll = function() {
 };
 
 mwb.resetIteration = function() {
-
-    console.log('Reset Iteration');
 
     mwb.warningSent = false;
 
@@ -100,7 +89,7 @@ mwb.resetIteration = function() {
 
 mwb.benchmarkPage = function(pageName, callback) {
 
-    console.log('STARTING A NEW BENCHMARK');
+    console.log('Benchmarking: ' + pageName);
 
     mwb.resetIteration();
 
@@ -123,8 +112,6 @@ mwb.benchmarkPage = function(pageName, callback) {
 
             mwb.fetchPage(pageName, function(err, data, time) {
 
-                console.dir(data);
-
                 if (!err) {
 
                     console.log('Iteration ' + mwb.currentIteration + ' in ' + time + 'ms');
@@ -137,6 +124,16 @@ mwb.benchmarkPage = function(pageName, callback) {
                         time: time
                     });
 
+                    if (!mwb.dataTable[mwb.currentIteration]) {
+                        mwb.dataTable[mwb.currentIteration] = {
+                            benchmark: mwb.currentTitle,
+                            run: mwb.currentIteration + 1
+                        };
+                    }
+
+                    mwb.dataTable[mwb.currentIteration][mwb.currentTitle] = time;
+
+
                     // mwb.progress Bar
                     mwb.currentIteration += 1;
                     var percent = mwb.currentIteration / mwb.totalIterations * 100;
@@ -147,7 +144,9 @@ mwb.benchmarkPage = function(pageName, callback) {
 
                     if (mwb.currentIteration === mwb.totalIterations) {
                         console.log('Completed Benchmark on ' + mwb.currentTitle);
+
                         mwb.drawChart();
+                        mwb.drawData();
 
                         if (callback) {
                             return callback(false); // No Error
@@ -220,6 +219,9 @@ mwb.drawChart = function() {
         })
         .y('time')
         .color('benchmark')
+        .timing({
+            transitions: 0
+        })
         .draw();
 
     // Box Plot Chart
@@ -236,22 +238,94 @@ mwb.drawChart = function() {
             value: 'time',
             label: 'TEST'
         })
+        .timing({
+            transitions: 0
+        })
         .draw();
 
-    // Data Table
-    $('#datatable').dynatable({
-        dataset: {
-            records: data
-        }
-    });
 };
 
 
 
+/**
+ * Analyzes the Data and generates a summary table
+ * Puts the raw Data to download formats
+ *
+ * Uses http://macwright.org/simple-statistics/ for Statistical Analysis
+ */
+mwb.drawData = function() {
+    "use strict";
+
+    console.log('Analyzing Data');
+
+    $('#progress-row').hide();
+
+    // Analyze Data & draw the Table
+    var html = '';
+
+    //$.each(mwb.dataObject.data, function (key, value) {
+    //
+    //    console.log(key + ' : ' + value);
+    //
+    //    var row = mwb.dataObject.data[key];
+    //
+    //    var analysis = {};
+    //
+    //    analysis.avg = ss.average(row);
+    //    analysis.min = ss.min(row);
+    //    analysis.max = ss.max(row);
+    //    analysis.standard_deviation = Math.round(ss.standard_deviation(row) * 100) / 100;
+    //
+    //    console.log(ss.average(row));
+    //
+    //    console.dir(analysis);
+    //
+    //    html += '<tr><td>' + key + '</td><td>' + analysis.avg + '</td><td>' + analysis.min + '</td><td>';
+    //    html += analysis.max + '</td><td>' + analysis.standard_deviation + '</td></tr>';
+    //
+    //    mwb.dataObject.analysis[key] = analysis;
+    //
+    //});
+
+    $('#data-tbody').html(html);
+    console.dir(mwb.dataObject);
+
+    // JSON Export: mwb.dataArray
+    var jsonExport = $('#jsonExport');
+    jsonExport.removeAttr("disabled");
+    var json = {
+        array: mwb.dataArray,
+        object: mwb.dataTable,
+        analysis: mwb.analysisObject,
+        options: mwb.options
+    };
+    jsonExport.attr('href', ('data:text/json;base64,' + btoa(JSON.stringify(json, false, 4))));
+    jsonExport.attr("download", mwb.getFormattedTime() + ".json");
+
+    // CSV Export
+    var csvExport = $('#csvExport');
+    csvExport.attr("href", 'data:text/csv;base64,' + btoa(mwb.convertToCSV(mwb.dataArray)));
+    csvExport.attr("download", mwb.getFormattedTime() + ".csv");
+    csvExport.removeAttr("disabled");
+
+    // SVG Export
+    var svgExportBarChart = $('#svgExportBarChart');
+    setTimeout(function() {
+        svgExportBarChart.attr("href", 'data:text/svg;base64,' + btoa($('#bar-chart svg').prop('outerHTML')));
+        svgExportBarChart.attr("download", mwb.getFormattedTime() + "_BarChart.svg");
+        svgExportBarChart.removeAttr("disabled");
+    }, 200);
 
 
+    // SVG Export
+    var svgExportBoxPlot = $('#svgExportBoxPlotChart');
+    setTimeout(function() {
+        svgExportBoxPlot.attr("href", 'data:text/svg;base64,' + btoa($('#boxplot-chart svg').prop('outerHTML')));
+        svgExportBoxPlot.attr("download", mwb.getFormattedTime() + "_BoxPlot.svg");
+        svgExportBoxPlot.removeAttr("disabled");
+    }, 200);
 
-
+};
 
 
 mwb.getOptions = function() {

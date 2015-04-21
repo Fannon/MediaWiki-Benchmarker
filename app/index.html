@@ -13,6 +13,7 @@
     <!-- endbuild -->
 
     <!-- build:css styles/main.css -->
+    <link rel="stylesheet" href="../bower_components/dynatable/jquery.dynatable.css">
     <link rel="stylesheet" href="styles/main.css">
     <!-- endbuild -->
 
@@ -46,14 +47,38 @@
         </div>
     </div>
 
+    <h3>Charts</h3>
     <div id="bar-chart"></div>
     <div id="boxplot-chart"></div>
 
-    <div id="data-table"></div>
+    <h3>Data</h3>
+    <div id="data_div">
+        <table class="table table-condensed table-bordered">
+            <thead>
+            <tr>
+                <th>Seite</th>
+                <th>Average Load time</th>
+                <th>Minimum Load time</th>
+                <th>Maximum Load time</th>
+                <th>Standard deviation</th>
+            </tr>
+            </thead>
+            <tbody id="data-tbody">
 
+            </tbody>
+        </table>
+    </div>
+
+    <a id='jsonExport' target="_blank" class="btn btn-info" disabled="disabled">Download as JSON</a>
+    <a id='csvExport' target="_blank" class="btn btn-info" disabled="disabled">DownloadCSV</a>
+    <a id='svgExportBarChart' target="_blank" class="btn btn-info" disabled="disabled">Download Bar Chart as SVG</a>
+    <a id='svgExportBoxPlotChart' target="_blank" class="btn btn-info" disabled="disabled">Download Box Plot as SVG</a>
+
+    <br>
+    <br>
 
     <div class="footer">
-        <p>Simon Heimler 2015</p>
+        <p>2015 - Simon Heimler | Open Source | Repository: <a href="https://github.com/Fannon/MediaWiki-Benchmark">Github</a></p>
     </div>
 </div>
 
@@ -62,6 +87,8 @@
 <script src="/bower_components/jquery/dist/jquery.js"></script>
 <script src="/bower_components/simple-statistics/src/simple_statistics.js"></script>
 <script src="/bower_components/dynatable/jquery.dynatable.js"></script>
+<script src="/bower_components/d3plus/js/d3.js"></script>
+<script src="/bower_components/d3plus/js/d3plus.js"></script>
 <!-- endbower -->
 <!-- endbuild -->
 
@@ -72,17 +99,15 @@
 <script src="/bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/tooltip.js"></script>
 <script src="/bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/modal.js"></script>
 <!-- <script src="/bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/transition.js"></script> -->
-<script src="/bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/button.js"></script>
+<!--<script src="/bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/button.js"></script>-->
 <!-- <script src="/bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/popover.js"></script> -->
 <!-- <script src="/bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/carousel.js"></script> -->
 <!-- <script src="/bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/scrollspy.js"></script> -->
 <!-- <script src="/bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/collapse.js"></script> -->
-<script src="/bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/tab.js"></script>
+<!--<script src="/bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/tab.js"></script>-->
 <!-- endbuild -->
 
 <!-- build:js scripts/main.js -->
-<script src="scripts/d3.js"></script>
-<script src="scripts/d3plus.js"></script>
 <script src="scripts/main.js"></script>
 <!-- endbuild -->
 </body>
