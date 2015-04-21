@@ -96,22 +96,49 @@ body {
   }
 }
 
-#boxplot-chart {
-    display: block;
+body {
+    padding-top: 8px;
+}
+
+.header {
+    margin-bottom: 4px;
+    text-align: center;
+    border: none;
+
+    h3 {
+        margin: 0;
+        padding: 0;
+    }
+}
+
+.chartWrapper {
     width: 100%;
+    border: 1px solid #DDD;
+    border-radius: 3px;
+    padding: 2px;
+    margin: 10px 0;
+
+    .chart {
+        display: block;
+        width: 100%;
+    }
+}
+
+
+
+
+#boxplot-chart {
     height: 500px;
 }
 #bar-chart {
-    display: block;
-    width: 100%;
-    height: 240px;
+    height: 250px;
 }
 
 #mwb-options {
-    #MediaWikiUrl {
+    #mediaWikiUrl {
         width: 500px;
     }
-    #PageName {
+    #pageName {
         width: 385px;
     }
 

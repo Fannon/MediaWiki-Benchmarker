@@ -19,12 +19,7 @@ var mwb = {}; // Global Namespace
  * Default Options
  * @type {Object}
  */
-mwb.options = {
-    mediaWikiUrl: 'http://semwiki-exp01.multimedia.hs-augsburg.de/ba-wiki',
-    iterations: 5,
-    minRandom: 100,
-    maxRandom: 200
-};
+mwb.options = {};
 
 
 //////////////////////////////
@@ -34,11 +29,25 @@ mwb.options = {
 $(function() {
     'use strict';
 
+    // Enable Tooltips
+    $('[data-toggle="tooltip"]').tooltip();
+
+    // Reset / Init Interface
     mwb.resetAll();
 
-    mwb.benchmarkPage('Hauptseite', function() {
+    $('#reset').on('click', function(e) {
+        e.preventDefault();
+        mwb.resetAll();
+        return false;
+    });
 
-    })
+    $('#startBenchmark').on('click', function(e) {
+        e.preventDefault();
+        mwb.getOptions();
+        mwb.benchmarkPage(mwb.options.pageName);
+        return false;
+    });
+
 
 });
 
@@ -62,11 +71,15 @@ mwb.resetAll = function() {
     /** Data */
     mwb.dataArray = []; // 2-dim array
     mwb.dataObject = []; // For d3plus
-    mwb.dataTable = [];  // For dynatable
     mwb.analysisObject = {};
 
+    // Read Options from Form
+    mwb.getOptions();
+
     // Reset Interface
-    $('#chart').html('');
+    $('#bar-chart').html('');
+    $('#boxplot-chart').html('');
+    $('#data-tbody').html('');
 
 };
 
@@ -83,15 +96,29 @@ mwb.resetIteration = function() {
 
     // Reset Interface
     $('#progress-bar').attr("aria-valuenow", 0).css('width', 0 + '%').text(0 + '%');
-    $('#progress').show();
 
 };
+
+
+mwb.getOptions = function() {
+
+    // Get current Form Values
+    mwb.options.mediaWikiUrl = $('#mediaWikiUrl').val();
+    mwb.options.pageName = $('#pageName').val();
+
+    mwb.options.iterations = parseInt($('#iterations').val(), 10);
+    mwb.options.minRandom = parseInt($('#minRandom').val(), 10);
+    mwb.options.maxRandom = parseInt($('#maxRandom').val(), 10);
+};
+
+
 
 
 mwb.benchmarkPage = function(pageName, callback) {
 
     console.log('Benchmarking: ' + pageName);
 
+    $('#progress').show();
     mwb.resetIteration();
 
     mwb.analysisObject.benchmarkStartUnix = Math.floor(new Date().getTime() / 1000);
@@ -125,16 +152,9 @@ mwb.benchmarkPage = function(pageName, callback) {
                         time: time
                     });
 
-                    if (!mwb.dataTable[mwb.currentIteration]) {
-                        mwb.dataTable[mwb.currentIteration] = {};
-                    }
-
-                    mwb.dataTable[mwb.currentIteration][mwb.currentTitle] = time;
-
-
                     // mwb.progress Bar
                     mwb.currentIteration += 1;
-                    var percent = mwb.currentIteration / mwb.totalIterations * 100;
+                    var percent = Math.round(mwb.currentIteration / mwb.totalIterations * 100);
                     $('#progress-bar')
                         .attr("aria-valuenow", percent)
                         .css('width', percent + '%')
@@ -170,7 +190,7 @@ mwb.fetchPage = function(pageName, callback) {
 
     var now = (new Date()).getTime();
 
-    $.getJSON(mwb.options.mediaWikiUrl + '/api.php?callback=?', {
+    $.getJSON(mwb.options.mediaWikiUrl + '?callback=?', {
         action: 'parse',
         page: pageName,
         format: 'json'
@@ -199,169 +219,6 @@ mwb.fetchPage = function(pageName, callback) {
 
 };
 
-
-mwb.drawChart = function() {
-
-    console.log('Drawing Charts');
-
-    data = mwb.dataObject;
-
-    // Bar Chart
-    mwb.barChart = d3plus.viz()
-        .container("#bar-chart")
-        .data(data)
-        .type('bar')
-        .id('run')
-        .x({
-            value: 'benchmark',
-            label: false
-        })
-        .y('time')
-        .color('benchmark')
-        .timing({
-            transitions: 0
-        })
-        .draw();
-
-    // Box Plot Chart
-    mwb.boxPlotChart = d3plus.viz()
-        .container("#boxplot-chart")
-        .data(data)
-        .type('box')
-        .id('run')
-        .x({
-            value: 'benchmark',
-            label: false
-        })
-        .y({
-            value: 'time',
-            label: 'TEST'
-        })
-        .timing({
-            transitions: 0
-        })
-        .draw();
-
-};
-
-
-
-/**
- * Analyzes the Data and generates a summary table
- * Puts the raw Data to download formats
- *
- * Uses http://macwright.org/simple-statistics/ for Statistical Analysis
- */
-mwb.drawData = function() {
-    "use strict";
-
-    console.log('Analyzing Data');
-
-    $('#progress-row').hide();
-
-    // Analyze Data & draw the Table
-    var html = '';
-
-
-    for (var i = 0; i < mwb.dataArray.length; i++) {
-        // Deep Copy of array
-        var column = JSON.parse(JSON.stringify(mwb.dataArray[i]));
-        var title = column.shift(); // Remove Column title
-
-        var analysis = {
-            avg: ss.average(column),
-            min: ss.min(column),
-            max: ss.max(column),
-            standard_deviation: Math.round(ss.standard_deviation(column) * 100) / 100
-        };
-
-        mwb.analysisObject[title] = analysis;
-
-        html += '<tr><td>' + title + '</td><td>' + analysis.avg + '</td><td>' + analysis.min + '</td><td>';
-        html += analysis.max + '</td><td>' + analysis.standard_deviation + '</td></tr>';
-
-    }
-
-    console.log(mwb.analysisObject);
-
-    //$.each(mwb.dataObject.data, function (key, value) {
-    //
-    //    console.log(key + ' : ' + value);
-    //
-    //    var row = mwb.dataObject.data[key];
-    //
-    //    var analysis = {};
-    //
-    //    analysis.avg = ss.average(row);
-    //    analysis.min = ss.min(row);
-    //    analysis.max = ss.max(row);
-    //    analysis.standard_deviation = Math.round(ss.standard_deviation(row) * 100) / 100;
-    //
-    //    console.log(ss.average(row));
-    //
-    //    console.dir(analysis);
-    //
-    //    html += '<tr><td>' + key + '</td><td>' + analysis.avg + '</td><td>' + analysis.min + '</td><td>';
-    //    html += analysis.max + '</td><td>' + analysis.standard_deviation + '</td></tr>';
-    //
-    //    mwb.dataObject.analysis[key] = analysis;
-    //
-    //});
-
-    $('#data-tbody').html(html);
-    console.dir(mwb.dataObject);
-
-    // JSON Export: mwb.dataArray
-    var jsonExport = $('#jsonExport');
-    jsonExport.removeAttr("disabled");
-    var json = {
-        array: mwb.dataArray,
-        object: mwb.dataTable,
-        analysis: mwb.analysisObject,
-        options: mwb.options
-    };
-    jsonExport.attr('href', ('data:text/json;base64,' + btoa(JSON.stringify(json, false, 4))));
-    jsonExport.attr("download", mwb.getFormattedTime() + ".json");
-
-    // CSV Export
-    var csvExport = $('#csvExport');
-    csvExport.attr("href", 'data:text/csv;base64,' + btoa(mwb.convertToCSV(mwb.dataArray)));
-    csvExport.attr("download", mwb.getFormattedTime() + ".csv");
-    csvExport.removeAttr("disabled");
-
-    // SVG Export
-    var svgExportBarChart = $('#svgExportBarChart');
-    setTimeout(function() {
-        svgExportBarChart.attr("href", 'data:text/svg;base64,' + btoa($('#bar-chart svg').prop('outerHTML')));
-        svgExportBarChart.attr("download", mwb.getFormattedTime() + "_BarChart.svg");
-        svgExportBarChart.removeAttr("disabled");
-    }, 200);
-
-
-    // SVG Export
-    var svgExportBoxPlot = $('#svgExportBoxPlotChart');
-    setTimeout(function() {
-        svgExportBoxPlot.attr("href", 'data:text/svg;base64,' + btoa($('#boxplot-chart svg').prop('outerHTML')));
-        svgExportBoxPlot.attr("download", mwb.getFormattedTime() + "_BoxPlot.svg");
-        svgExportBoxPlot.removeAttr("disabled");
-    }, 200);
-
-};
-
-
-mwb.getOptions = function() {
-    // Get current Form Values
-    mwb.options.mediaWikiUrl = $('#mediaWikiUrl').val();
-    mwb.options.maxCounter = parseInt($('#maxCounter').val(), 10);
-    mwb.options.minRandom = parseInt($('#minRandom').val(), 10);
-    mwb.options.maxRandom = parseInt($('#maxRandom').val(), 10);
-    mwb.options.purgeInterval = parseInt($('#purgeInterval').val(), 10);
-    mwb.options.notes = $('#notes').val();
-
-    if (!mwb.options.purgeInterval || mwb.options.purgeInterval === 0) {
-        mwb.options.purgePages = false;
-    }
-};
 
 
 /**
@@ -406,10 +263,133 @@ mwb.purgePage = function(page, currentCounter, currentInterval) {
 };
 
 
+
+
 //////////////////////////////////////////
 // DRAWING FUNCTIONS                    //
 //////////////////////////////////////////
 
+mwb.drawChart = function() {
+
+    console.log('Drawing Charts');
+    $('#bar-chart').html('');
+    $('#boxplot-chart').html('');
+
+    data = mwb.dataObject;
+
+    // Bar Chart
+    mwb.barChart = d3plus.viz()
+        .container("#bar-chart")
+        .data(data)
+        .type('bar')
+        .id('run')
+        .x({
+            value: 'benchmark',
+            label: false
+        })
+        .y('time')
+        .height(236)
+        .color('benchmark')
+        .timing({
+            transitions: 0
+        })
+        .draw();
+
+    // Box Plot Chart
+    mwb.boxPlotChart = d3plus.viz()
+        .container("#boxplot-chart")
+        .data(data)
+        .type('box')
+        .id('run')
+        .x({
+            value: 'benchmark',
+            label: false
+        })
+        .y({
+            value: 'time',
+            label: 'TEST'
+        })
+        .timing({
+            transitions: 0
+        })
+        .draw();
+
+};
+
+
+
+/**
+ * Analyzes the Data and generates a summary table
+ * Puts the raw Data to download formats
+ *
+ * Uses http://macwright.org/simple-statistics/ for Statistical Analysis
+ */
+mwb.drawData = function() {
+    "use strict";
+
+    console.log('Analyzing Data');
+
+    // Analyze Data & draw the Table
+    var html = '';
+
+
+    for (var i = 0; i < mwb.dataArray.length; i++) {
+        // Deep Copy of array
+        var column = JSON.parse(JSON.stringify(mwb.dataArray[i]));
+        var title = column.shift(); // Remove Column title
+
+        var analysis = {
+            avg: Math.round(ss.average(column) * 100) / 100,
+            min: ss.min(column),
+            max: ss.max(column),
+            standard_deviation: Math.round(ss.standard_deviation(column) * 100) / 100
+        };
+
+        mwb.analysisObject[title] = analysis;
+
+        html += '<tr><td>' + title + '</td><td>' + analysis.avg + '</td><td>' + analysis.min + '</td><td>';
+        html += analysis.max + '</td><td>' + analysis.standard_deviation + '</td></tr>';
+
+    }
+
+    $('#data-tbody').html(html);
+
+    // JSON Export: mwb.dataArray
+    var jsonExport = $('#jsonExport');
+    jsonExport.removeAttr("disabled");
+    var json = {
+        array: mwb.dataArray,
+        object: mwb.dataObject,
+        analysis: mwb.analysisObject,
+        options: mwb.options
+    };
+    jsonExport.attr('href', ('data:text/json;base64,' + btoa(JSON.stringify(json, false, 4))));
+    jsonExport.attr("download", mwb.getFormattedTime() + ".json");
+
+    // CSV Export
+    var csvExport = $('#csvExport');
+    csvExport.attr("href", 'data:text/csv;base64,' + btoa(mwb.convertToCSV(mwb.dataArray)));
+    csvExport.attr("download", mwb.getFormattedTime() + ".csv");
+    csvExport.removeAttr("disabled");
+
+    // SVG Export
+    var svgExportBarChart = $('#svgExportBarChart');
+    setTimeout(function() {
+        svgExportBarChart.attr("href", 'data:text/svg;base64,' + btoa($('#bar-chart svg').prop('outerHTML')));
+        svgExportBarChart.attr("download", mwb.getFormattedTime() + "_BarChart.svg");
+        svgExportBarChart.removeAttr("disabled");
+    }, 200);
+
+
+    // SVG Export
+    var svgExportBoxPlot = $('#svgExportBoxPlotChart');
+    setTimeout(function() {
+        svgExportBoxPlot.attr("href", 'data:text/svg;base64,' + btoa($('#boxplot-chart svg').prop('outerHTML')));
+        svgExportBoxPlot.attr("download", mwb.getFormattedTime() + "_BoxPlot.svg");
+        svgExportBoxPlot.removeAttr("disabled");
+    }, 200);
+
+};
 
 //////////////////////////////
 // Helper Functions         //
