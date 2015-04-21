@@ -2,8 +2,11 @@
 <html class="no-js" lang="">
 <head>
     <meta charset="utf-8">
-    <meta name="description" content="A web-based MediaWiki Benchmarker">
+
     <meta name="author" content="Simon Heimler">
+    <meta name="keywords" content="MediaWiki, Benchmark, Benchmarker">
+    <meta name="description" content="A web-based MediaWiki Benchmarker">
+
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>MediaWiki Benchmarker</title>
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
@@ -20,63 +23,76 @@
 </head>
 <body>
 
-
 <div class="container">
+
+    <!-- Header -->
     <div class="header">
         <h3 class="text-muted">MediaWiki Benchmarker <small id="lastBenchmark"></small></h3>
     </div>
 
+    <!-- Progress "Bar" -->
     <div id="progress" class="progress">
         <div id="progress-bar" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0">
         </div>
     </div>
 
+    <!-- Options -->
     <form id="mwb-options" class="form-inline">
 
-        <div class="form-group">
+        <div class="form-wrapper">
+            <div class="form-group">
 
-            <input type="url" class="form-control" id="mediaWikiUrl" placeholder="MediaWiki URL"
-                   value="http://en.wikipedia.org/w/api.php" required
-                   data-toggle="tooltip" data-placement="top" title="URL to the MediaWiki API (http://de.wikipedia.org/w/api.php)">
-            <input type="text" class="form-control" id="pageName" placeholder="PageName" value="Main Page" required
-                   data-toggle="tooltip" data-placement="top" title="Wiki page name">
+                <input type="url" class="form-control" id="mediaWikiUrl" placeholder="MediaWiki URL"
+                       value="http://en.wikipedia.org/w/api.php" required
+                       data-toggle="tooltip" data-placement="top"
+                       title="URL to the MediaWiki API (http://de.wikipedia.org/w/api.php)">
+
+                <input type="text" class="form-control" id="pageName" placeholder="PageName" value="Main Page" required
+                       data-toggle="tooltip" data-placement="top" title="Wiki page name">
+            </div>
         </div>
 
-        <p>
-
-            <div class="form-group ">
+        <div class="form-wrapper">
+            <div class="form-group">
                 <input type="number" class="form-control" id="iterations" placeholder="Iterations" value="20" required
                        data-toggle="tooltip" data-placement="top" title="Number of Iterations">
+
                 <input type="number" class="form-control" id="minRandom" placeholder="MinRandom" value="400" required
                        data-toggle="tooltip" data-placement="top" title="Minimum random time inverval (time between requests)">
+
                 <input type="number" class="form-control" id="maxRandom" placeholder="MaxRandom" value="800" required
                        data-toggle="tooltip" data-placement="top" title="Maximum random time inverval (time between requests)">
+
                 <input type="text" class="form-control" id="note" placeholder="note" value=""
                        data-toggle="tooltip" data-placement="top" title="Optional note about the current benchmark run">
+
                 <button class="btn btn-default btn-danger" id="reset"
                         data-toggle="tooltip" data-placement="top" title="Reset all benchmarked data">
-                        Reset Data
-                </button>
+                        Reset Data</button>
+
                 <button id="startBenchmark" type="submit" class="btn btn-default btn-success"
                         data-toggle="tooltip" data-placement="top" title="Starts the benchmark; will append to existing data">
-                        Start / Add Benchmark
-                </button>
+                        Start / Add Benchmark</button>
+
             </div>
-        </p>
+        </div>
+
     </form>
 
-
-
+    <!-- Warning Messages -->
     <div id="messages"></div>
 
+    <!-- Bar Chart -->
     <div class="chartWrapper">
         <div id="bar-chart" class="chart"></div>
     </div>
 
+    <!-- BoxPlot Chart -->
     <div class="chartWrapper">
         <div id="boxplot-chart" class="chart"></div>
     </div>
 
+    <!-- Summary Table -->
     <div id="data_div" class="chartWrapper">
         <table id="summary-table" class="table table-condensed">
             <thead>
@@ -93,42 +109,29 @@
         </table>
     </div>
 
-    <a id='jsonExport' target="_blank" class="btn btn-primary" disabled="disabled">Download as JSON</a>
-    <a id='csvExport' target="_blank" class="btn btn-primary" disabled="disabled">Download as CSV</a>
-    <a id='svgExportBarChart' target="_blank" class="btn btn-info" disabled="disabled">Download Bar Chart as SVG</a>
-    <a id='svgExportBoxPlotChart' target="_blank" class="btn btn-info" disabled="disabled">Download Box Plot as SVG</a>
-
-    <br>
-    <br>
-
-    <div class="footer">
-        2015 - Simon Heimler | Open Source | Repository: <a href="https://github.com/Fannon/MediaWiki-Benchmark">Github</a>
+    <!-- Download / Export Buttons-->
+    <div class="form-wrapper">
+        <a id='jsonExport' target="_blank" class="btn btn-primary" disabled="disabled">Download as JSON</a>
+        <a id='csvExport' target="_blank" class="btn btn-primary" disabled="disabled">Download as CSV</a>
+        <a id='svgExportBarChart' target="_blank" class="btn btn-info" disabled="disabled">Download Bar Chart as SVG</a>
+        <a id='svgExportBoxPlotChart' target="_blank" class="btn btn-info" disabled="disabled">Download Box Plot as SVG</a>
     </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        2015 - Simon Heimler | Open Source at <a href="https://github.com/Fannon/MediaWiki-Benchmark">Github</a>
+    </div>
+
 </div>
 
 <!-- build:js scripts/vendor.js -->
 <!-- bower:js -->
-<script src="/bower_components/modernizr/modernizr.js"></script>
 <script src="/bower_components/jquery/dist/jquery.js"></script>
 <!-- endbower -->
 <script src="/bower_components/d3plus/js/d3.js"></script>
 <script src="/bower_components/d3plus/js/d3plus.js"></script>
-
-<!-- endbuild -->
-
-<!-- build:js scripts/plugins.js -->
-<!-- <script src="/bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/affix.js"></script> -->
- <script src="/bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/alert.js"></script>
-<!-- <script src="/bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/dropdown.js"></script> -->
 <script src="/bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/tooltip.js"></script>
-<!--<script src="/bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/modal.js"></script>-->
-<!-- <script src="/bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/transition.js"></script> -->
-<!--<script src="/bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/button.js"></script>-->
-<!-- <script src="/bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/popover.js"></script> -->
-<!-- <script src="/bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/carousel.js"></script> -->
-<!-- <script src="/bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/scrollspy.js"></script> -->
-<!-- <script src="/bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/collapse.js"></script> -->
-<!--<script src="/bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/tab.js"></script>-->
+<script src="/bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/alert.js"></script>
 <!-- endbuild -->
 
 <!-- build:js scripts/main.js -->
