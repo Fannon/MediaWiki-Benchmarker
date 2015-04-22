@@ -59,12 +59,6 @@ body {
     }
 }
 
-//#boxplot-chart {
-//    height: 500px;
-//}
-//#bar-chart {
-//    height: 250px;
-//}
 .chart-description {
     background: #EEE;
     border-radius: 3px;
@@ -78,28 +72,42 @@ body {
     text-align: center;
 }
 
+.input-group .form-control {
+    font-size: 12px;
+}
+
 #mwb-options {
 
     #mediaWikiUrl {
-        width: 500px;
+        width: 243px;
     }
     #pageName {
-        width: 442px;
+        width: 397px;
+    }
+
+    #note {
+        width: 200px;
     }
 
     #minRandom,
     #maxRandom,
-    #iterations {
-        width: 130px;
-    }
-
-    #note {
-        width: 260px;
+    #iterations,
+    #barChartHeight,
+    #boxPlotHeight {
+        width: 75px;
     }
 
     #startBenchmark {
-        width: 180px;
+        width: 89px;
     }
+
+
+}
+
+.input-group-addon {
+    padding: 0 9px;
+    font-size: 12px;
+    color: #555;
 }
 
 .alert {

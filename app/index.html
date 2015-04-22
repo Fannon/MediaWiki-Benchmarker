@@ -42,37 +42,70 @@
         <div class="form-wrapper">
             <div class="form-group">
 
-                <input type="url" class="form-control" id="mediaWikiUrl" placeholder="MediaWiki URL"
-                       value="http://en.wikipedia.org/w/api.php" required
-                       data-toggle="tooltip" data-placement="top"
-                       title="URL to the MediaWiki API (http://de.wikipedia.org/w/api.php)">
+                <div class="input-group">
+                    <input type="url" class="form-control" id="mediaWikiUrl" placeholder="MediaWiki URL"
+                           value="http://en.wikipedia.org/w/api.php" required
+                           data-toggle="tooltip" data-placement="top"
+                           title="URL to the MediaWiki API (http://de.wikipedia.org/w/api.php)">
+                    <div class="input-group-addon">API</div>
+                </div>
 
-                <input type="text" class="form-control" id="pageName" placeholder="PageName" value="Albert Einstein; Isaac Newton" required
-                       data-toggle="tooltip" data-placement="top" title="Wiki page name(s). Multiple pages can be separated by ;">
+
+                <div class="input-group">
+                    <input type="text" class="form-control" id="pageName" placeholder="PageName" value="Albert Einstein; Isaac Newton" required
+                           data-toggle="tooltip" data-placement="top" title="Wiki page name(s). Multiple pages can be separated by ;">
+                    <div class="input-group-addon">Page(s)</div>
+                </div>
+
+                <input type="text" class="form-control" id="note" placeholder="note" value=""
+                       data-toggle="tooltip" data-placement="top" title="Optional note about the current benchmark run">
+
+
             </div>
         </div>
 
         <div class="form-wrapper">
             <div class="form-group">
-                <input type="number" class="form-control" id="iterations" placeholder="Iterations" value="8" required
-                       data-toggle="tooltip" data-placement="top" title="Number of Iterations">
 
-                <input type="number" class="form-control" id="minRandom" placeholder="MinRandom" value="800" required
-                       data-toggle="tooltip" data-placement="top" title="Minimum random time inverval (time between requests)">
+                <div class="input-group">
+                    <input type="number" class="form-control" id="iterations" placeholder="Iterations" value="8" required
+                           data-toggle="tooltip" data-placement="top" title="Number of Iterations">
+                    <div class="input-group-addon">Iterations</div>
+                </div>
 
-                <input type="number" class="form-control" id="maxRandom" placeholder="MaxRandom" value="1000" required
-                       data-toggle="tooltip" data-placement="top" title="Maximum random time inverval (time between requests)">
+                <div class="input-group">
+                    <input type="number" class="form-control" id="minRandom" placeholder="MinRandom" value="1200" required
+                           data-toggle="tooltip" data-placement="top" title="Minimum random time inverval (time between requests)">
+                    <div class="input-group-addon">minIntv</div>
+                </div>
 
-                <input type="text" class="form-control" id="note" placeholder="note" value=""
-                       data-toggle="tooltip" data-placement="top" title="Optional note about the current benchmark run">
+                <div class="input-group">
+                    <input type="number" class="form-control" id="maxRandom" placeholder="MaxRandom" value="2000" required
+                           data-toggle="tooltip" data-placement="top" title="Maximum random time inverval (time between requests)">
+                    <div class="input-group-addon">maxIntv</div>
+                </div>
+
+                <div class="input-group">
+                    <input type="number" class="form-control" id="barChartHeight" placeholder="barChartHeight" value="250" required
+                           data-toggle="tooltip" data-placement="top" title="Height of the bar chart (in pixels)">
+                    <div class="input-group-addon">barChartHeight</div>
+                </div>
+
+                <div class="input-group">
+                    <input type="number" class="form-control" id="boxPlotHeight" placeholder="boxPlotHeight" value="500" required
+                           data-toggle="tooltip" data-placement="top" title="Height of the box plot chart (in pixels)">
+                    <div class="input-group-addon">boxPlotHeight</div>
+                </div>
+
+
 
                 <button class="btn btn-default btn-danger" id="reset"
                         data-toggle="tooltip" data-placement="top" title="Reset all benchmarked data">
-                        Reset Data</button>
+                        RESET</button>
 
                 <button id="startBenchmark" type="submit" class="btn btn-default btn-success"
                         data-toggle="tooltip" data-placement="top" title="Starts the benchmark; will append to existing data">
-                        Start / Add Benchmark</button>
+                        START</button>
 
             </div>
         </div>

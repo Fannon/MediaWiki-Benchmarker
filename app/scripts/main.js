@@ -20,8 +20,6 @@ var mwb = {}; // Global Namespace
  * @type {Object}
  */
 mwb.options = {
-    barChartHeight: 250,
-    boxPlotHeight: 500,
     previewModulo: 3,
     //colorScale: [
     //    '#3182bd',
@@ -139,6 +137,8 @@ mwb.getOptions = function() {
     mwb.options.iterations = parseInt($('#iterations').val().trim(), 10);
     mwb.options.minRandom = parseInt($('#minRandom').val().trim(), 10);
     mwb.options.maxRandom = parseInt($('#maxRandom').val().trim(), 10);
+    mwb.options.barChartHeight = parseInt($('#barChartHeight').val().trim(), 10);
+    mwb.options.boxPlotHeight = parseInt($('#boxPlotHeight').val().trim(), 10);
 
     // If more than one pageName is given (separated by ;), create a job queue
     if (mwb.options.pageName.indexOf(';') > -1) {
