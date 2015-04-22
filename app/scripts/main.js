@@ -20,7 +20,24 @@ var mwb = {}; // Global Namespace
  * @type {Object}
  */
 mwb.options = {
-    previewModulo: 3
+    barChartHeight: 250,
+    boxPlotHeight: 500,
+    previewModulo: 3,
+    //colorScale: [
+    //    '#3182bd',
+    //    '#e6550d',
+    //    '#31a354',
+    //    '#756bb1',
+    //    '#444444',
+    //
+    //    '#5254a3',
+    //    '#ad494a',
+    //    '#8ca252',
+    //    '#17becf',
+    //    '#8c6d31',
+    //    '#969696'
+    //]
+    colorScale: 'category10'
 };
 
 
@@ -243,6 +260,7 @@ mwb.onPageFetch = function(err, data, time) {
             benchmark: mwb.currentTitle,
             benchmarkCounter: mwb.benchmark,
             run: mwb.currentIteration + 1,
+            timestamp: Math.floor(new Date().getTime() / 1000),
             time: time
         });
 
@@ -253,6 +271,15 @@ mwb.onPageFetch = function(err, data, time) {
             .attr('aria-valuenow', percent)
             .css('width', percent + '%')
             .text(percent + '% (' + time + 'ms)');
+
+
+        if (time > mwb.options.minRandom && !mwb.warningSent) {
+            var msg = 'Warning: The MediaWiki API is responding slower than the minimum random time interval.<br>';
+            msg += 'This may lead to stacked up / queued HTTP requests. See <a href="https://github.com/Fannon/MediaWiki-Benchmarker#known-problems" target="_blank">Known Problems</a>.<br>';
+            msg += 'To avoid this increase the Minimum Random Intervall so that it is higher than the expected Response time.';
+            mwb.log(msg);
+            mwb.warningSent = true;
+        }
 
 
         // If all iterations have run, complete the benchmark run
@@ -353,8 +380,16 @@ mwb.drawChart = function() {
             scale: 'discrete'
         })
         .y('time')
-        .height(236)
-        .color('benchmark')
+        .height(mwb.options.barChartHeight)
+        .color({
+            value: 'benchmark',
+            scale:  mwb.options.colorScale
+        })
+        .legend(false)
+        .text(function(d) {
+            return d.benchmark + ' (' + d.run + ')';
+        })
+        .tooltip(['benchmark', 'run', 'time'])
         .timing({
             transitions: 0
         })
@@ -374,7 +409,15 @@ mwb.drawChart = function() {
             scale: 'discrete'
         })
         .y('time')
-        .color('benchmark')
+        .height(mwb.options.boxPlotHeight)
+        .color({
+            value: 'benchmark',
+            scale: mwb.options.colorScale
+        })
+        .legend(false)
+        .tooltip({
+            children: false
+        })
         .timing({
             transitions: 0
         })
