@@ -290,6 +290,7 @@ mwb.onPageFetch = function(err, data, time) {
             mwb.drawChart();
             mwb.drawData();
 
+            $('#progress-bar').attr('aria-valuenow', 0).css('width', 0 + '%').text('');
             console.log('Completed Benchmark in ' + totalTime + 'ms on ' + mwb.currentTitle);
 
             if (mwb.options.jobQueue[0]) {
