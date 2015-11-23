@@ -3,7 +3,7 @@
     "title" : "MediaWiki Benchmarker",
     "description" : "A simple web application that can benchmark MediaWiki installations through the API. It can draw bar and boxplot charts and allows to download / export the benchmarked data as CSV or JSON files. The charts can be downloaded as SVG vector graphics.",
     "url" : "http://fannon.de/p/mediawiki-benchmark/",
-    "keywords" : "tools, benchmark, statistics, API",
+    "keywords" : "tools, benchmark, statistics, API, svg, json",
     "author" : "Simon Heimler",
     "repository" : "https://github.com/Fannon/MediaWiki-Benchmarker.git"
 }
