@@ -4,9 +4,8 @@ This is a simple web application that can benchmark MediaWiki installations thro
 The tool draws bar and boxplot charts and allows to download / export the benchmarked data as CSV or JSON files.
 The charts can be downloaded as SVG vector graphics.
 
-You can try/use it online: http://fannon.de/p/mediawiki-benchmark/
+You can try/use it online: http://fannon.github.io/MediaWiki-Benchmarker/
 
-![Screenshot](http://up.fannon.de/img/2015-04-25_06_13_56.png "Screenshot of MediaWiki Benchmark")
 
 ### Troubleshooting ###
 In case you run into cross origin issues, it may be necessary to upload the benchmarker to the server. 
@@ -24,9 +23,6 @@ $wgCrossSiteAJAXdomains = array( '*' );
 The Browser has a limitation of max opened connections.
 Be careful that the benchmarker doesn't make new requests faster than the browser can actually make them. 
 
-If this is the case, the requests will stack up and so will the time that is measured. This will lead to a stair-like chart:
-
-![stair-like chart](http://up.fannon.de/img/2015-04-21_22_05_03.png "Screenshot of a chart where requests have stacked up")
-
+If this is the case, the requests will stack up and so will the time that is measured. This will lead to a stair-like chart.
 This problem is most likely not on the server, but the client (Browser) side. Seen from the client side the benchmark is correct however.
 To benchmark a server under high(er) stress it would be needed to simultaneously benchmark from different computers and different locations
